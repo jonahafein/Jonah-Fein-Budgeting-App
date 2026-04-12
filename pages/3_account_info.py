@@ -3,7 +3,7 @@ import pandas as pd
 
 # need logic to actually save a profile, and be able to update/edit a profile
 
-st.title("Jonah Fein Budgeting App")
+st.title("Account Info")
 
 # initialize the session state
 if "email" not in st.session_state:
@@ -14,14 +14,6 @@ if "debt_df" not in st.session_state:
     
 if "profile" not in st.session_state:
     st.session_state.profile = {}
-    
-email_input = st.text_input("Enter your email address")
-
-if st.button("Start"):
-    if email_input:
-        st.session_state.email = email_input
-    else:
-        st.warning("Please enter an email")
 
 
 if st.session_state.email: 
