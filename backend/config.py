@@ -1,0 +1,1 @@
+connection_string = "Driver=/opt/homebrew/lib/libmsodbcsql.18.dylib;Server=tcp:budgeting-app.database.windows.net,1433;Database=budgeting_app_users;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"

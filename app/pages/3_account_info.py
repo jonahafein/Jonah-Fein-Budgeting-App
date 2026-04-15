@@ -1,7 +1,32 @@
 import streamlit as st
 import pandas as pd
+import sys
+import os
+
+folder_path = os.path.abspath("/Users/jonahafein//Desktop/Python Projects/Jonah-Fein-Budgeting-App/backend")
+
+if folder_path not in sys.path:
+    sys.path.append(folder_path)
+
+from db import Database
+
 
 # need logic to actually save a profile, and be able to update/edit a profile
+
+if not st.session_state.get("email"):
+    st.warning("Please log in first")
+    st.stop()
+    
+def build_profile():
+    return {
+        "email": st.session_state.email,
+        "savings": st.session_state.get("savings"),
+        'apy': st.session_state.get("apy"),
+        'brokerage': st.session_state.get("brokerage"),
+        'retirement': st.session_state.get('retirement'),
+        'goals': st.session_state.get('goals'),
+        'debt_df': st.session_state.debt_df.to_dict()
+    }
 
 st.title("Account Info")
 
@@ -13,7 +38,7 @@ if "debt_df" not in st.session_state:
     st.session_state.debt_df = pd.DataFrame(columns = ["Item", "Balance", "Interest Rate"])
     
 if "profile" not in st.session_state:
-    st.session_state.profile = {}
+    st.session_state.profile = build_profile()
 
 
 if st.session_state.email: 
@@ -32,17 +57,17 @@ if st.session_state.email:
     mortgage_info = None
     house_info = None
     
-    savings = st.number_input("Enter your total liquid savings:")
+    savings = st.number_input("Enter your total liquid savings:", key = "savings")
     if savings > 0:
-        apy = st.number_input("Enter your savings account's apy %:")
+        apy = st.number_input("Enter your savings account's apy %:", key = "apy")
 
-    brokerage = st.number_input("Enter your non retirement investment total:")
+    brokerage = st.number_input("Enter your non retirement investment total:", key = "brokerage")
     if brokerage > 0:
-        brokerage_returns = st.number_input("Enter your expected brokerage percentage average returns based on your fund's history")
+        brokerage_returns = st.number_input("Enter your expected brokerage percentage average returns based on your fund's history", key = "brokerage_returns")
 
-    retirement = st.number_input("Enter your retirement account(s) total:")
+    retirement = st.number_input("Enter your retirement account(s) total:", key = "retirement")
     if retirement > 0:
-        retirement_returns = st.number_input("Enter your expected retirement percentage average returns based on your fund's history")
+        retirement_returns = st.number_input("Enter your expected retirement percentage average returns based on your fund's history", key = "retirement_returns")
         
     home = st.selectbox("Do you own a home?", ["no", "yes"])
     
@@ -53,28 +78,28 @@ if st.session_state.email:
         if paid == 'no': 
             col1,col2,col3, col4, col5 = st.columns(5)
             with col1:
-                years = st.number_input("How many years left on the mortgage?")
+                years = st.number_input("How many years left on the mortgage?", key = "years")
             with col2:
-                balance = st.number_input("What is the remaining balance?")
+                balance = st.number_input("What is the remaining balance?", key = "balance")
             with col3:
-                interest = st.number_input("What is the interest rate? (If variable, give an average)")
+                interest = st.number_input("What is the interest rate? (If variable, give an average)", key = "interest")
             with col4:
-                fees = st.number_input("Typical monthly non-mortgage house costs?")  
+                fees = st.number_input("Typical monthly non-mortgage house costs?", key = "fees")  
             with col5:
-                value = st.number_input("What is your home's estimated value?")             
+                value = st.number_input("What is your home's estimated value?", key = "value")             
             mortgage_info = [years, balance, interest, fees, value]
         else:
             col1,col2 = st.columns(2)
             with col1:
-                value = st.number_input("What is your home's value?")
+                value = st.number_input("What is your home's value?", key = "value")
             with col2:
-                fees = st.number_input("Typical monthly non-mortgage house costs?")
+                fees = st.number_input("Typical monthly non-mortgage house costs?", key = "fees")
             house_info = [value, fees]
     # add other necessary questions
 
     goals = st.multiselect('Goals:', ['Build up my emergency fund', 'invest/save for non retirement', 'invest for retirement', 'get out of debt', 'other'])
     if 'other' in goals:
-        monthly_other = st.number_input("Estimate how many dollars a month you will need to put away for your other category:")
+        monthly_other = st.number_input("Estimate how many dollars a month you will need to put away for your other category:", key = "monthly_other")
     if 'get out of debt' in goals:
         st.write("List all of your non mortgage debt 1 by 1:")
         if 'debt_df' not in st.session_state:
@@ -84,11 +109,11 @@ if st.session_state.email:
         with col1:
             item = st.text_input("Enter debt item:")
         with col2:
-            balance = st.number_input("Enter debt balance")
+            balance = st.number_input("Enter debt balance", key = "balance")
         with col3:
-            interest = st.number_input("Enter interest rate:")
+            interest = st.number_input("Enter interest rate:", key = "interest")
             
-        if st.button("Add"):
+        if st.button("Add Debt"):
             if item:
                 st.session_state.debt_df.loc[len(st.session_state.debt_df)] = [item, balance, interest]
             else:
