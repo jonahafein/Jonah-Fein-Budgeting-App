@@ -10,7 +10,6 @@ if folder_path not in sys.path:
 
 from db import Database
 
-
 # need logic to actually save a profile, and be able to update/edit a profile
 
 if not st.session_state.get("email"):
