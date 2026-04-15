@@ -1,6 +1,6 @@
 # Jonah-Fein-Budgeting-App
 This will be a manual budgeting app inspired by the Every Dollar app.
 
-Eventually it will hopefully not be manual.
+Eventually it will (hopefully) not be manual.
 
 
