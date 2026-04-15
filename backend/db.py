@@ -52,11 +52,3 @@ class Database:
             return {"user_id": row[0], "email": row[1]}
         return None 
     
-# test = Database()
-# conn = test.get_conn()
-# cursor = conn.cursor()
-# cursor.execute("SELECT * FROM dbo.users")
-# rows = cursor.fetchall()
-# print(rows)
-# cursor.close()
-# conn.close()
