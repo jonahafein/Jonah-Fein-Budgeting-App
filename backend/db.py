@@ -25,6 +25,22 @@ class Database:
        cursor.close()
        conn.close()
        
+    def insert_non_home_assets(self, user_id, savings, apy, brokerage, brokerage_returns, retirement, retirement_returns):
+        #TODO
+        pass
+    
+    def insert_home(self, user_id, paid_off, home_value, years, balance, interest, fees):
+        #TODO
+        pass
+    
+    def insert_goals(self, goals_id, user_id, goal):
+        #TODO
+        pass
+    
+    def insert_debt(self, debt_id, user_id, debt_item, debt_balance, debt_interest):
+        #TODO
+        pass
+       
     def get_user(self, email):
         conn = self.get_conn()
         cursor = conn.cursor()
