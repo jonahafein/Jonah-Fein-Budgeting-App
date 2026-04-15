@@ -26,12 +26,23 @@ class Database:
        conn.close()
        
     def insert_non_home_assets(self, user_id, savings, apy, brokerage, brokerage_returns, retirement, retirement_returns):
-        #TODO
-        pass
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO non_home_assets (user_id, savings, apy, brokerage, brokerage_returns, retirement, retirement_returns) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       user_id, savings, apy, brokerage, brokerage_returns, retirement, retirement_returns)
+        conn.commit()
+        cursor.close()
+        conn.close()
     
     def insert_home(self, user_id, paid_off, home_value, years, balance, interest, fees):
         #TODO
-        pass
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO home (user_id, paid_off, home_value, years, balance, interest, fees) VALUES (?, ?, ?, ?, ?, ?, ?)", 
+                       user_id, paid_off, home_value, years, balance, interest, fees)
+        conn.commit()
+        cursor.close()
+        conn.close()
     
     def insert_goals(self, goals_id, user_id, goal):
         #TODO
