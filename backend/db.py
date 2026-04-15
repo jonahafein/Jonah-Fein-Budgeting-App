@@ -16,22 +16,25 @@ class Database:
         conn = pyodbc.connect(self.connection_string, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct})
         return conn
     
-    def insert_user(email):
-       conn = Database().get_conn()
+    
+    def insert_user(self, email):
+       conn = self.get_conn()
        cursor = conn.cursor()
        cursor.execute("INSERT INTO users (user_email) VALUES (?)", email)
        conn.commit() 
        cursor.close()
        conn.close()
        
-    def get_user(email):
-        conn = Database.get_conn()
+    def get_user(self, email):
+        conn = self.get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE user_email = ?", email)
-        user = cursor.fetchall()
+        cursor.execute("SELECT user_id, user_email FROM users WHERE user_email = ?", email)
+        row = cursor.fetchone()
         cursor.close()
         conn.close()
-        return user
+        if row:
+            return {"user_id": row[0], "email": row[1]}
+        return None 
     
 # test = Database()
 # conn = test.get_conn()
