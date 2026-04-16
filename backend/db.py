@@ -35,7 +35,6 @@ class Database:
         conn.close()
     
     def insert_home(self, user_id, paid_off, home_value, years, balance, interest, fees):
-        #TODO
         conn = self.get_conn()
         cursor = conn.cursor()
         cursor.execute("INSERT INTO home (user_id, paid_off, home_value, years, balance, interest, fees) VALUES (?, ?, ?, ?, ?, ?, ?)", 
@@ -44,13 +43,23 @@ class Database:
         cursor.close()
         conn.close()
     
-    def insert_goals(self, goals_id, user_id, goal):
-        #TODO
-        pass
+    def insert_goal(self, user_id, goal):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO goals (user_id, goal) VALUES (?, ?)", 
+                       user_id, goal)
+        conn.commit()
+        cursor.close()
+        conn.close()
     
-    def insert_debt(self, debt_id, user_id, debt_item, debt_balance, debt_interest):
-        #TODO
-        pass
+    def insert_debt(self, user_id, debt_item, debt_balance, debt_interest):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO debt (user_id, debt_item, debt_balance, debt_interest) VALUES (?, ?, ?, ?)", 
+                       user_id, debt_item, debt_balance, debt_interest)
+        conn.commit()
+        cursor.close()
+        conn.close()
        
     def get_user(self, email):
         conn = self.get_conn()
@@ -62,4 +71,64 @@ class Database:
         if row:
             return {"user_id": row[0], "email": row[1]}
         return None 
+    
+    def get_non_home_assets(self, user_id):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT savings, apy, brokerage, brokerage_returns, retirement, retirement_returns FROM non_home_assets WHERE user_id = ?", user_id)
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if row:
+            return {"savings": row[0], "apy": row[1], "brokerage": row[2], "brokerage_returns": row[3], "retirement": row[4], "retirement_returns": row[5]}
+        else:
+            return None
+    
+    def get_home(self, user_id):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT paid_off, home_value, years, balance, interest, fees FROM home WHERE user_id = ?", user_id)
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if row:
+            return {"paid_off": row[0], "home_value": row[1], "years": row[2], "balance": row[3], "interest": row[4], "fees": row[5]}
+        else:
+            return None
+    
+    def get_goals(self, user_id):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT goal FROM goals WHERE user_id = ?", user_id)
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        if rows:
+            return [row[0] for row in rows]
+        else: 
+            return [] 
+    
+    def get_debts(self, user_id):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT debt_item, debt_balance, debt_interest FROM debt WHERE user_id = ?", user_id)
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        if rows:
+            return [{"debt_item": row[0], "debt_balance": row[1], "debt_interest": row[2]} for row in rows]
+        else:
+            return []  
+        
+    # function for all:
+    def get_profile(self, user_id):
+        return{
+            "non_home_assets": self.get_non_home_assets(user_id),
+            "home": self.get_home(user_id),
+            "goals": self.get_goals(user_id),
+            "debts": self.get_debts(user_id)
+        } 
+        
+    # TODO: implement the update methods     
+        
     
