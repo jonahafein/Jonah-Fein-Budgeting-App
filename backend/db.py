@@ -129,6 +129,18 @@ class Database:
             "debts": self.get_debts(user_id)
         } 
         
-    # TODO: implement the update methods     
+    # TODO: implement the update methods
+    def update_non_home_assets(self, user_id, savings, apy, brokerage, brokerage_returns, retirement, retirement_returns):
+        pass
+    
+    def update_home(self, user_id, paid_off, home_value, years, balance, interest, fees):
+        pass
+    
+    def  update_goal(self, user_id, goal):
+        pass
+    
+    def update_debts(self, user_id, debt_item, debt_balance, debt_interest):
+        pass
+             
         
     
