@@ -127,6 +127,8 @@ class Database:
             "home": self.get_home(user_id),
             "goals": self.get_goals(user_id),
             "debts": self.get_debts(user_id)
-        }      
+        } 
+        
+    # TODO: implement the update methods     
         
     
