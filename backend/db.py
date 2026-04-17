@@ -131,16 +131,58 @@ class Database:
         
     # TODO: implement the update methods
     def update_non_home_assets(self, user_id, savings, apy, brokerage, brokerage_returns, retirement, retirement_returns):
-        pass
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM non_home_assets WHERE user_id = ?", user_id)
+        exists = cursor.fetchone()[0]
+        
+        if exists > 0:
+            cursor.execute("UPDATE non_home_assets SET savings = ?, apy = ?, brokerage = ?, brokerage_returns = ?, retirement = ?, retirement_returns = ? WHERE user_id = ?",
+                       savings, apy, brokerage, brokerage_returns, retirement, retirement_returns, user_id)
+        else:
+            cursor.execute("INSERT INTO non_home_assets (user_id, savings, apy, brokerage, brokerage_returns, retirement, retirement_returns) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       user_id, savings, apy, brokerage, brokerage_returns, retirement, retirement_returns)
+        conn.commit()
+        cursor.close()
+        conn.close() 
     
     def update_home(self, user_id, paid_off, home_value, years, balance, interest, fees):
-        pass
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM home WHERE user_id = ?", user_id)
+        exists = cursor.fetchone()[0]
+        
+        if exists > 0:
+            cursor.execute("UPDATE home SET paid_off = ?, home_value = ?, years = ?, balance = ?, interest = ?, fees = ? WHERE user_id = ?", paid_off,
+                           home_value, years, balance, interest, fees, user_id)
+        else:
+            cursor.execute("INSERT INTO home (user_id, paid_off, home_value, years, balance, interest, fees) VALUES (?, ?, ?, ?, ?, ?, ?)", 
+                       user_id, paid_off, home_value, years, balance, interest, fees)
+        conn.commit()
+        cursor.close()
+        conn.close()
     
-    def  update_goal(self, user_id, goal):
-        pass
+    def update_goals(self, user_id, goals: list):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM goals WHERE user_id = ?", user_id)        
+        for goal in goals:
+            cursor.execute("INSERT INTO goals (user_id, goal) VALUES (?, ?)", user_id, goal)
+        conn.commit()
+        cursor.close()
+        conn.close()
     
-    def update_debts(self, user_id, debt_item, debt_balance, debt_interest):
-        pass
+    def update_debts(self, user_id, debt_df):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM debt WHERE user_id = ?", user_id)
+        for _, row in debt_df.iterrows():
+            cursor.execute("INSERT INTO debt (user_id, debt_item, debt_balance, debt_interest) VALUES (?, ?, ?, ?)", user_id,
+                           row["Item"], row["Balance"], row["Interest Rate"])
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
              
         
     
