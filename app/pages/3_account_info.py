@@ -110,30 +110,31 @@ if st.session_state.email:
             house_info = [years, balance, interest, value, fees]
     # add other necessary questions
 
-    goals = st.multiselect('Goals:', ['Build up my emergency fund', 'invest/save for non retirement', 'invest for retirement', 'get out of debt', 'other'], default = st.session_state.goals)
+    goals = st.multiselect('Goals:', ['Build up my emergency fund', 'invest/save for non retirement', 'invest for retirement', 'other'], default = st.session_state.goals)
     st.session_state.goals = goals
     if 'other' in goals:
         monthly_other = st.number_input("Estimate how many dollars a month you will need to put away for your other category:", key = "monthly_other")
-    if 'get out of debt' in goals:
-        st.write("List all of your non mortgage debt 1 by 1:")
-        if 'debt_df' not in st.session_state:
-            st.session_state.debt_df = pd.DataFrame(columns = ["Item", "Balance", "Interest Rate"])
+    
+    
+    st.write("List all of your non mortgage debt 1 by 1:")
+    if 'debt_df' not in st.session_state:
+        st.session_state.debt_df = pd.DataFrame(columns = ["Item", "Balance", "Interest Rate"])
+    
+    col1,col2,col3 = st.columns(3)
+    with col1:
+        item = st.text_input("Enter debt item:")
+    with col2:
+        balance = st.number_input("Enter debt balance", key = "balance")
+    with col3:
+        interest = st.number_input("Enter interest rate:", key = "interest")
         
-        col1,col2,col3 = st.columns(3)
-        with col1:
-            item = st.text_input("Enter debt item:")
-        with col2:
-            balance = st.number_input("Enter debt balance", key = "balance")
-        with col3:
-            interest = st.number_input("Enter interest rate:", key = "interest")
+    if st.button("Add Debt"):
+        if item:
+            st.session_state.debt_df.loc[len(st.session_state.debt_df)] = [item, balance, interest]
+        else:
+            st.warning("Please enter an item")
             
-        if st.button("Add Debt"):
-            if item:
-                st.session_state.debt_df.loc[len(st.session_state.debt_df)] = [item, balance, interest]
-            else:
-                st.warning("Please enter an item")
-                
-        st.write("### Debt:", st.session_state.debt_df)
+    st.write("### Debt:", st.session_state.debt_df)
                 
     if st.button("Save profile"):
         st.session_state.profile = {
@@ -146,7 +147,7 @@ if st.session_state.email:
             "retirement_returns": retirement_returns if retirement > 0 else None,
             "goals": goals,
             "monthly_other": monthly_other if "other" in goals else None,
-            "debt_df": st.session_state.debt_df if "get out of debt" in goals else None,
+            "debt_df": st.session_state.debt_df if st.session_state.debt_df else None,
             "home": home,
             "paid": paid,
             "house_info": house_info if paid == "yes" else None
