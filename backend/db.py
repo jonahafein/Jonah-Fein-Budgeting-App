@@ -9,7 +9,7 @@ class Database:
         
     # method needed to connect for other methods
     def get_conn(self):
-        credential = identity.DefaultAzureCredential(exclude_interactive_browser_credential = False)
+        credential = identity.DefaultAzureCredential(exclude_interactive_browser_credential = True)
         token_bytes = credential.get_token("https://database.windows.net/.default").token.encode("UTF-16-LE")
         token_struct = struct.pack(f'<I{len(token_bytes)}s', len(token_bytes), token_bytes)
         SQL_COPT_SS_ACCESS_TOKEN = 1256  # This connection option is defined by microsoft in msodbcsql.h
@@ -80,7 +80,7 @@ class Database:
         cursor.close()
         conn.close()
         if row:
-            return {"savings": row[0], "apy": row[1], "brokerage": row[2], "brokerage_returns": row[3], "retirement": row[4], "retirement_returns": row[5]}
+            return {"savings": float(row[0]) if row[0] is not None else 0, "apy": float(row[1]) if row[1] is not None else 0, "brokerage": float(row[2]) if row[2] is not None else 0, "brokerage_returns": float(row[3]) if row[3] is not None else 0, "retirement": float(row[4]) if row[4] is not None else 0, "retirement_returns": float(row[5]) if row[5] is not None else 0}
         else:
             return None
     
@@ -92,7 +92,7 @@ class Database:
         cursor.close()
         conn.close()
         if row:
-            return {"paid_off": row[0], "home_value": row[1], "years": row[2], "balance": row[3], "interest": row[4], "fees": row[5]}
+            return {"paid_off": bool(row[0]) if row[0] is not None else False, "home_value": float(row[1]) if row[1] is not None else 0, "years": int(row[2]) if row[2] is not None else 0, "balance": float(row[3]) if row[3] is not None else 0, "interest": float(row[4]) if row[4] is not None else 0, "fees": float(row[5]) if row[5] is not None else 0}
         else:
             return None
     
@@ -116,7 +116,7 @@ class Database:
         cursor.close()
         conn.close()
         if rows:
-            return [{"debt_item": row[0], "debt_balance": row[1], "debt_interest": row[2]} for row in rows]
+            return [{"debt_item": row[0] if row[0] is not None else None, "debt_balance": float(row[1]) if row[1] is not None else 0, "debt_interest": float(row[2]) if row[2] is not None else 0} for row in rows]
         else:
             return []  
         
@@ -158,6 +158,14 @@ class Database:
         else:
             cursor.execute("INSERT INTO home (user_id, paid_off, home_value, years, balance, interest, fees) VALUES (?, ?, ?, ?, ?, ?, ?)", 
                        user_id, paid_off, home_value, years, balance, interest, fees)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+    def delete_home(self, user_id):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM home WHERE user_id = ?", user_id)
         conn.commit()
         cursor.close()
         conn.close()
