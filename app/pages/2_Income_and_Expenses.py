@@ -26,8 +26,9 @@ user_id = user["user_id"]
 if "loaded" not in st.session_state:
     pass
     # TODO: make these methods in db
-    annual_income = db.get_income(user_id)["annual_income"]
-    annual_bonus = db.get_income(user_id)["annual_bonus"]
+    income = db.get_income(user_id)
+    annual_income = income["annual_income"]
+    annual_bonus = income["annual_bonus"]
     expenses_df = db.get_expenses(user_id)
     
     st.session_state.annual_income = annual_income if annual_income else 0
@@ -35,7 +36,7 @@ if "loaded" not in st.session_state:
     if expenses_df:
         st.session_state.expenses_df = pd.DataFrame([{
             "category": expense["category"],
-            "amount": d["amount"]
+            "amount": expense["amount"]
         }for expense in expenses_df])
     
     st.session_state.loaded = True
@@ -50,3 +51,36 @@ if st.session_state.email:
     email = st.session_state.email
     
     # now get all the user inputs:
+    annual_income = st.number_input("What is your annual base income?", value = st.session_state.annual_income)
+    annual_bonus = st.number_input("What is your expected annual bonus?", value = st.session_state.annual_bonus)
+    
+    st.write("List all of monthly expenses:")
+    if 'debt_df' not in st.session_state:
+        st.session_state.expenses_df = pd.DataFrame(columns = ["category", "amount"])
+    
+    col1,col2 = st.columns(2)
+    with col1:
+        category = st.text_input("Enter expense category:")
+    with col2:
+        amount = st.number_input("Enter expense amount", key = "amount")
+        
+    if st.button("Add Expense"):
+        if category:
+            st.session_state.expense_df.loc[len(st.session_state.expense_df)] = [category, amount]
+        else:
+            st.warning("Please enter an expense")
+            
+    st.write("### Expenses:", st.session_state.expense_df)
+    if st.button("Save Income and Expenses"):
+        st.session_state.profile = {
+            "email": email,
+            "annual_income": annual_income,
+            "annual_bonus": annual_bonus,
+            "expense_df": st.session_state.expense_df if not st.session_state.expense_df.empty else None
+        }
+        # TODO: make the update methods
+        db = Database()
+        user_id = db.get_user(email)["user_id"]
+        db.update_income(user_id, annual_income, annual_bonus)
+        db.update_expenses(user_id, st.session_state.expense_df)
+        st.success("Income and Expenses Saved!")

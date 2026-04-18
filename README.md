@@ -6,10 +6,11 @@ Eventually it will (hopefully) not be manual.
 TODO/Ideas:
 - Need methods for users to update data √
 - Fix home data bug for entering and saving √
+- Income and expenses (make necessary methods in db)
 - Apy (and likely returns not accepting decimals)
 - Ask for age
-- Next income and expenses
 - Option for user to do avalanche or snowball - descriptions of each with pros and cons included.
+- Check if I ever even use the insert methods or just update
 
 
 

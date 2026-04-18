@@ -154,7 +154,7 @@ if st.session_state.email:
             
     st.write("### Debt:", st.session_state.debt_df)
                 
-    if st.button("Save profile"):
+    if st.button("Save Assets and Goals"):
         st.session_state.profile = {
             "email": email,
             "savings": savings,
@@ -182,7 +182,7 @@ if st.session_state.email:
         goals = list(st.session_state.goals)
         db.update_goals(user_id, goals)
         db.update_debts(user_id, st.session_state.debt_df)
-        st.success("profile saved!")
+        st.success("Assets and Goals Saved!")
     
         
         
