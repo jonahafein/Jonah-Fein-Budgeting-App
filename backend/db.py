@@ -133,8 +133,16 @@ class Database:
             return None
         
     def get_expenses(self, user_id):
-        # TODO: implement
-        pass
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT category, amount FROM expenses WHERE user_id = ?", user_id)
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        if rows:
+            return [{"category": row[0] if row[0] is not None else None, "amount": float(row[1]) if row[1] is not None else 0} for row in rows]
+        else:
+            return []  
         
         
     # function for all:
@@ -209,12 +217,31 @@ class Database:
         conn.close()
         
     def update_income(self, user_id, annual_income, annual_bonus):
-        # TODO: implement
-        pass
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM income WHERE user_id = ?", user_id)
+        exists = cursor.fetchone()[0]
+        
+        if exists > 0:
+            cursor.execute("UPDATE income SET annual_income = ?, annual_bonus = ? WHERE user_id = ?",
+                       annual_income, annual_bonus, user_id)
+        else:
+            cursor.execute("INSERT INTO income (user_id, annual_income, annual_bonus) VALUES (?, ?, ?)",
+                       user_id, annual_income, annual_bonus)
+        conn.commit()
+        cursor.close()
+        conn.close() 
     
     def update_expenses(self,user_id, expenses_df):
-        # TODO: implement
-        pass
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM expenses WHERE user_id = ?", user_id)
+        for _, row in expenses_df.iterrows():
+            cursor.execute("INSERT INTO expenses (user_id, category, amount) VALUES (?, ?, ?)", user_id,
+                           row["category"], row["amount"])
+        conn.commit()
+        cursor.close()
+        conn.close()
         
              
         

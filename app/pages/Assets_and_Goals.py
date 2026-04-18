@@ -41,6 +41,12 @@ if "loaded" not in st.session_state:
     st.session_state.retirement_returns = assets["retirement_returns"] if assets else 0
     st.session_state.goals = goals if goals else []
     st.session_state.home_data = home_data if home_data else None
+    if home_data:
+        st.session_state.years = home_data["years"]
+        st.session_state.home_balance = home_data["balance"]
+        st.session_state.home_interest = home_data["interest"]
+        st.session_state.fees = home_data["fees"]
+        st.session_state.home_value = home_data["home_value"]
     if debt_df:
         st.session_state.debt_df = pd.DataFrame([{
             "Item": d["debt_item"],
@@ -63,21 +69,21 @@ if st.session_state.email:
     email = st.session_state.email
     monthly_other = None
     home_data = st.session_state.home_data
-    paid = True if home_data and home_data["balance"] == 0 else False
+    paid = home_data["paid_off"] if home_data else False
     house_info = home_data
     
     # now we allow for inputs and updated session state - will have update methods used later
     savings = st.number_input("Savings:", value = st.session_state.savings)
     st.session_state.savings = savings
-    apy = st.number_input("Apy:", value = st.session_state.apy)
+    apy = st.number_input("Apy:", value = st.session_state.apy, step=0.01, format="%.2f")
     st.session_state.apy = apy
     brokerage = st.number_input("Brokerage:", value = st.session_state.brokerage)
     st.session_state.brokerage = brokerage
-    brokerage_returns = st.number_input("Brokerage expected returns:", value = st.session_state.brokerage_returns)
+    brokerage_returns = st.number_input("Brokerage expected returns:", value = st.session_state.brokerage_returns, step=0.01, format="%.2f")
     st.session_state.brokerage_returns = brokerage_returns
     retirement = st.number_input("Retirement:", value = st.session_state.retirement)
     st.session_state.retirement = retirement
-    retirement_returns = st.number_input("Retirement expected returns:", value = st.session_state.retirement_returns)
+    retirement_returns = st.number_input("Retirement expected returns:", value = st.session_state.retirement_returns, step=0.01, format="%.2f")
     st.session_state.retirement_returns = retirement_returns
 
     home_exists = True if home_data else False
@@ -96,35 +102,45 @@ if st.session_state.email:
         if paid == 'no': 
             col1,col2,col3, col4, col5 = st.columns(5)
             with col1:
-                years = st.number_input("How many years left on the mortgage?", value = st.session_state.home_data["years"] if st.session_state.home_data else 0)
+                years = st.number_input("How many years left on the mortgage?", value = st.session_state.get("years", home_data["years"] if home_data else 0))
+                st.session_state.years = years
             with col2:
-                balance = st.number_input("What is the remaining balance?", value = st.session_state.home_data["balance"] if st.session_state.home_data else 0)
+                home_balance = st.number_input("What is the remaining balance?", value = st.session_state.get("home_balance", home_data["balance"] if home_data else 0))
+                st.session_state.home_balance = home_balance
             with col3:
-                interest = st.number_input("What is the interest rate? (If variable, give an average)", st.session_state.home_data["interest"] if st.session_state.home_data else 0)
+                home_interest = st.number_input("What is the interest rate? (If variable, give an average)", value = st.session_state.get("home_interest", home_data["interest"] if home_data else 0), step=0.01, format="%.2f")
+                st.session_state.home_interest = home_interest
             with col4:
-                fees = st.number_input("Typical monthly non-mortgage house costs?", st.session_state.home_data["fees"] if st.session_state.home_data else 0)  
+                fees = st.number_input("Typical monthly non-mortgage house costs?", value = st.session_state.get("fees", home_data["fees"] if home_data else 0))  
+                st.session_state.fees = fees
             with col5:
-                value = st.number_input("What is your home's estimated value?", st.session_state.home_data["home_value"] if st.session_state.home_data else 0)             
-            house_info = [years, balance, interest, fees, value]
+                value = st.number_input("What is your home's estimated value?", value = st.session_state.get("home_value", home_data["home_value"] if home_data else 0))
+                st.session_state.home_value = value             
+            house_info = [years, home_balance, home_interest, fees, value]
         else:
             col1,col2, col3, col4, col5 = st.columns(5)
             with col1:
                 years = None
+                st.session_state.years = 0
             with col2:
-                balance = None
+                home_balance = None
+                st.session_state.home_balance = 0
             with col3:
-                interest = None
+                home_interest = None
+                st.session_state.home_interest = 0
             with col4:
-                value = st.number_input("What is your home's value?", st.session_state.home_data["home_value"]if st.session_state.home_data else 0)
+                value = st.number_input("What is your home's value?", st.session_state.get("home_value", home_data["home_value"] if home_data else 0))
+                st.session_state.home_value = value
             with col5:
-                fees = st.number_input("Typical monthly non-mortgage house costs?", st.session_state.home_data["fees"] if st.session_state.home_data else 0)
-            house_info = [years, balance, interest, value, fees]
+                fees = st.number_input("Typical monthly non-mortgage house costs?", st.session_state.get("fees", home_data["fees"] if home_data else 0))
+                st.session_state.fees = fees
+            house_info = [years, home_balance, home_interest, value, fees]
     else:
         paid = None 
         value = None 
         years = None
-        balance = None 
-        interest = None
+        home_balance = None 
+        home_interest = None
         fees = None
     # add other necessary questions
 
@@ -144,7 +160,7 @@ if st.session_state.email:
     with col2:
         balance = st.number_input("Enter debt balance", key = "balance")
     with col3:
-        interest = st.number_input("Enter interest rate:", key = "interest")
+        interest = st.number_input("Enter interest rate:", key = "interest", step=0.01, format="%.2f")
         
     if st.button("Add Debt"):
         if item:
@@ -168,7 +184,7 @@ if st.session_state.email:
             "debt_df": st.session_state.debt_df if not st.session_state.debt_df.empty else None,
             "home": home,
             "paid": paid,
-            "house_info": house_info if paid == "yes" else None
+            "house_info": house_info
         }
         # TODO: make the update methods
         db = Database()
@@ -176,13 +192,14 @@ if st.session_state.email:
         db.update_non_home_assets(user_id, savings, apy, brokerage, brokerage_returns, retirement, retirement_returns)
         paid_bool = True if paid == "yes" else False
         if home == "yes":
-            db.update_home(user_id, paid_bool, value, years, balance, interest, fees)
+            db.update_home(user_id, paid_bool, st.session_state.home_value, st.session_state.years, st.session_state.home_balance, st.session_state.home_interest, st.session_state.fees)
         else:
             db.delete_home(user_id)
         goals = list(st.session_state.goals)
         db.update_goals(user_id, goals)
         db.update_debts(user_id, st.session_state.debt_df)
         st.success("Assets and Goals Saved!")
+        st.session_state.home_data = db.get_home(user_id)
     
         
         
