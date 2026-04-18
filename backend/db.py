@@ -120,6 +120,23 @@ class Database:
         else:
             return []  
         
+    def get_income(self, user_id):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT annual_income, annual_bonus FROM income WHERE user_id = ?", user_id)
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if row:
+            return {"annual_income": float(row[0]) if row[0] is not None else 0, "annual_bonus": float(row[1]) if row[1] is not None else 0}
+        else:
+            return None
+        
+    def get_expenses(self, user_id):
+        # TODO: implement
+        pass
+        
+        
     # function for all:
     def get_profile(self, user_id):
         return{
@@ -190,6 +207,14 @@ class Database:
         conn.commit()
         cursor.close()
         conn.close()
+        
+    def update_income(self, user_id, annual_income, annual_bonus):
+        # TODO: implement
+        pass
+    
+    def update_expenses(self,user_id, expenses_df):
+        # TODO: implement
+        pass
         
              
         
