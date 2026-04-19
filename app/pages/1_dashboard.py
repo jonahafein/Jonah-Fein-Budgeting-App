@@ -5,3 +5,5 @@ if not st.session_state.get("email"):
     st.stop()
 
 st.title("Account Dashboard")
+
+st.write("Account insights for", st.session_state.email, ":")
