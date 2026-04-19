@@ -17,10 +17,10 @@ class Database:
         return conn
     
     
-    def insert_user(self, email):
+    def insert_user(self, email_input, birthdate):
        conn = self.get_conn()
        cursor = conn.cursor()
-       cursor.execute("INSERT INTO users (user_email) VALUES (?)", email)
+       cursor.execute("INSERT INTO users (user_email, birthdate) VALUES (?, ?)", (email_input, birthdate))
        conn.commit() 
        cursor.close()
        conn.close()
@@ -64,12 +64,12 @@ class Database:
     def get_user(self, email):
         conn = self.get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT user_id, user_email FROM users WHERE user_email = ?", email)
+        cursor.execute("SELECT user_id, user_email, birthdate FROM users WHERE user_email = ?", email)
         row = cursor.fetchone()
         cursor.close()
         conn.close()
         if row:
-            return {"user_id": row[0], "email": row[1]}
+            return {"user_id": row[0], "email": row[1], "birthdate": row[2]}
         return None 
     
     def get_non_home_assets(self, user_id):
@@ -123,12 +123,12 @@ class Database:
     def get_income(self, user_id):
         conn = self.get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT annual_income, annual_bonus FROM income WHERE user_id = ?", user_id)
+        cursor.execute("SELECT annual_income, annual_bonus, state_tax, local_tax FROM income WHERE user_id = ?", user_id)
         row = cursor.fetchone()
         cursor.close()
         conn.close()
         if row:
-            return {"annual_income": float(row[0]) if row[0] is not None else 0, "annual_bonus": float(row[1]) if row[1] is not None else 0}
+            return {"annual_income": float(row[0]) if row[0] is not None else 0, "annual_bonus": float(row[1]) if row[1] is not None else 0, "state_tax": float(row[2]) if row[2] is not None else 0, "local_tax": float(row[3]) if row[3] is not None else 0}
         else:
             return None
         
@@ -216,18 +216,18 @@ class Database:
         cursor.close()
         conn.close()
         
-    def update_income(self, user_id, annual_income, annual_bonus):
+    def update_income(self, user_id, annual_income, annual_bonus, state_tax, local_tax):
         conn = self.get_conn()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM income WHERE user_id = ?", user_id)
         exists = cursor.fetchone()[0]
         
         if exists > 0:
-            cursor.execute("UPDATE income SET annual_income = ?, annual_bonus = ? WHERE user_id = ?",
-                       annual_income, annual_bonus, user_id)
+            cursor.execute("UPDATE income SET annual_income = ?, annual_bonus = ?, state_tax = ?, local_tax = ? WHERE user_id = ?",
+                       annual_income, annual_bonus, state_tax, local_tax, user_id)
         else:
-            cursor.execute("INSERT INTO income (user_id, annual_income, annual_bonus) VALUES (?, ?, ?)",
-                       user_id, annual_income, annual_bonus)
+            cursor.execute("INSERT INTO income (user_id, annual_income, annual_bonus, state_tax, local_tax) VALUES (?, ?, ?, ?, ?)",
+                       user_id, annual_income, annual_bonus, state_tax, local_tax)
         conn.commit()
         cursor.close()
         conn.close() 
@@ -239,6 +239,14 @@ class Database:
         for _, row in expenses_df.iterrows():
             cursor.execute("INSERT INTO expenses (user_id, category, amount) VALUES (?, ?, ?)", user_id,
                            row["category"], row["amount"])
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+    def update_birthdate(self, user_email, birthdate):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET birthdate = ? WHERE user_email = ?", (birthdate, user_email))   
         conn.commit()
         cursor.close()
         conn.close()

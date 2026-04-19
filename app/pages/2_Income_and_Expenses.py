@@ -29,10 +29,14 @@ if "income_loaded" not in st.session_state:
     income = db.get_income(user_id)
     annual_income = income["annual_income"] if income else 0
     annual_bonus = income["annual_bonus"] if income else 0
+    state_tax = income["state_tax"] if income else 0
+    local_tax = income["local_tax"] if income else 0
     expenses_df = db.get_expenses(user_id)
     
     st.session_state.annual_income = annual_income if annual_income else 0
     st.session_state.annual_bonus = annual_bonus if annual_bonus else 0
+    st.session_state.state_tax = state_tax if state_tax else 0
+    st.session_state.local_tax = local_tax if local_tax else 0
     if expenses_df is not None:
         st.session_state.expenses_df = pd.DataFrame([{
             "category": expense["category"],
@@ -58,6 +62,10 @@ if st.session_state.email:
     st.session_state.annual_income = annual_income
     annual_bonus = st.number_input("What is your expected annual bonus?", value = float(st.session_state.annual_bonus))
     st.session_state.annual_bonus = annual_bonus
+    state_tax = st.number_input("What is your state tax %?", value = float(st.session_state.state_tax))
+    st.session_state.state_tax = state_tax
+    local_tax = st.number_input("What is your local tax %?", value = float(st.session_state.local_tax))
+    st.session_state.local_tax = local_tax
     
     st.write("List all of monthly expenses:")
     if 'expenses_df' not in st.session_state:
@@ -81,11 +89,13 @@ if st.session_state.email:
             "email": email,
             "annual_income": annual_income,
             "annual_bonus": annual_bonus,
+            "state_tax": state_tax,
+            "local_tax": local_tax,
             "expenses_df": st.session_state.expenses_df if not st.session_state.expenses_df.empty else None
         }
         # TODO: make the update methods
         db = Database()
         user_id = db.get_user(email)["user_id"]
-        db.update_income(user_id, annual_income, annual_bonus)
+        db.update_income(user_id, annual_income, annual_bonus, state_tax, local_tax)
         db.update_expenses(user_id, st.session_state.expenses_df)
         st.success("Income and Expenses Saved!")
