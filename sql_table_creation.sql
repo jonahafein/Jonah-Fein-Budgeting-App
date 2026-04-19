@@ -1,0 +1,1 @@
+-- Run the following in your Azure SQL Database to create necessary tables:
