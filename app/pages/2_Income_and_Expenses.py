@@ -62,9 +62,9 @@ if st.session_state.email:
     st.session_state.annual_income = annual_income
     annual_bonus = st.number_input("What is your expected annual bonus?", value = float(st.session_state.annual_bonus))
     st.session_state.annual_bonus = annual_bonus
-    state_tax = st.number_input("What is your state tax %?", value = float(st.session_state.state_tax))
+    state_tax = st.number_input("What is your state income tax %?", value = float(st.session_state.state_tax))
     st.session_state.state_tax = state_tax
-    local_tax = st.number_input("What is your local tax %?", value = float(st.session_state.local_tax))
+    local_tax = st.number_input("What is your local income tax %?", value = float(st.session_state.local_tax))
     st.session_state.local_tax = local_tax
     
     st.write("List all of monthly expenses:")
