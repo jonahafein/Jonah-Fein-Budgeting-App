@@ -76,6 +76,13 @@ if home_data:
     st.session_state.home_interest = home_data["interest"]
     st.session_state.fees = home_data["fees"]
     st.session_state.home_value = home_data["home_value"]
+else:
+    st.session_state.years = 0
+    st.session_state.home_balance = 0
+    st.session_state.home_interest = 0
+    st.session_state.fees = 0
+    st.session_state.home_value = 0
+    
 if debt_df:
     st.session_state.debt_df = pd.DataFrame([{
         "Item": d["debt_item"],
@@ -97,7 +104,10 @@ total_income = st.session_state.annual_income + st.session_state.annual_bonus
 
 # snapshot
 st.subheader("Your Current Finnancial Snapshot:")
-    
+net_worth = utils.calculate_net_worth(home_value = st.session_state.home_value, home_debt = st.session_state.home_balance, savings = st.session_state.savings, brokerage = st.session_state.brokerage, retirement = st.session_state.retirement, debt_total = st.session_state.debt_df["Balance"].sum())
+st.write(f"Your current net worth is ${net_worth:.2f}")
+st.write("Your debt's are:")
+st.write(st.session_state.debt_df)   
 # for each of these, add an estimated time to completion for goals
 st.subheader("Reccomendations:")
 if st.session_state.savings < 1000:
@@ -110,8 +120,8 @@ elif "debt_df" in st.session_state and not st.session_state.debt_df.empty and st
     monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = total_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc)
     monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df)
     st.write(f"We reccomend you temporarily pause all saving and investing (including retirement) and invest your entire monthly margin at your non-mortgage debt, starting with {highest_interest_debt} as it is your highest interest debt.")
-    st.write(f"Your monthly margin this month should be roughly {monthly_margin:.2f} dollars.")
-    st.write(f"We also reccomend you take {st.session_state.savings - 1000: .2f} from your savings and put in on your debt, again starting with {highest_interest_debt}")
+    st.write(f"Your monthly margin this month should be roughly ${monthly_margin:.2f} dollars.")
+    st.write(f"We also reccomend you take ${st.session_state.savings - 1000: .2f} from your savings and put in on your debt, again starting with {highest_interest_debt}")
     
 # next build up to 6 months of emergency
     
