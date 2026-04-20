@@ -9,11 +9,14 @@ TODO/Ideas:
 - Income and expenses (make necessary methods in db) √
 - Balance and interest rate not saving for house √
 - Apy (and likely returns not accepting decimals) √
-- Ask for state and local taxes (should be done but need to test)
+- Ask for state and local taxes (should be done but need to test) √
 - Ask for age √
+- util methods for dashboard
+- dashboard (make it update assets and goals as time goes on)
 - Option for user to do avalanche or snowball - descriptions of each with pros and cons included.
 - Check if I ever even use the insert methods or just update
 - Make the UI look nicer (use st.form for debt_df and expense_df later)
+- Write out sql_table_creation.sql
 
 
 
