@@ -123,12 +123,12 @@ class Database:
     def get_income(self, user_id):
         conn = self.get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT annual_income, annual_bonus, state_tax, local_tax FROM income WHERE user_id = ?", user_id)
+        cursor.execute("SELECT annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match FROM income WHERE user_id = ?", user_id)
         row = cursor.fetchone()
         cursor.close()
         conn.close()
         if row:
-            return {"annual_income": float(row[0]) if row[0] is not None else 0, "annual_bonus": float(row[1]) if row[1] is not None else 0, "state_tax": float(row[2]) if row[2] is not None else 0, "local_tax": float(row[3]) if row[3] is not None else 0}
+            return {"annual_income": float(row[0]) if row[0] is not None else 0, "annual_bonus": float(row[1]) if row[1] is not None else 0, "state_tax_perc": float(row[2]) if row[2] is not None else 0, "local_tax_perc": float(row[3]) if row[3] is not None else 0, "marriage_status": row[4] if row[4] else "single", "employer_match": float(row[5] if row[5] else 0)}
         else:
             return None
         
@@ -216,18 +216,18 @@ class Database:
         cursor.close()
         conn.close()
         
-    def update_income(self, user_id, annual_income, annual_bonus, state_tax, local_tax):
+    def update_income(self, user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match):
         conn = self.get_conn()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM income WHERE user_id = ?", user_id)
         exists = cursor.fetchone()[0]
         
         if exists > 0:
-            cursor.execute("UPDATE income SET annual_income = ?, annual_bonus = ?, state_tax = ?, local_tax = ? WHERE user_id = ?",
-                       annual_income, annual_bonus, state_tax, local_tax, user_id)
+            cursor.execute("UPDATE income SET annual_income = ?, annual_bonus = ?, state_tax_perc = ?, local_tax_perc = ?, marriage_status = ?, employer_match = ? WHERE user_id = ?",
+                       annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match, user_id)
         else:
-            cursor.execute("INSERT INTO income (user_id, annual_income, annual_bonus, state_tax, local_tax) VALUES (?, ?, ?, ?, ?)",
-                       user_id, annual_income, annual_bonus, state_tax, local_tax)
+            cursor.execute("INSERT INTO income (user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                       user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match)
         conn.commit()
         cursor.close()
         conn.close() 

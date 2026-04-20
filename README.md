@@ -11,12 +11,15 @@ TODO/Ideas:
 - Apy (and likely returns not accepting decimals) √
 - Ask for state and local taxes (should be done but need to test) √
 - Ask for age √
+- Ask single or married (need to update income table + db methods) - should be done but need to test √
 - util methods for dashboard
+- Need to account for interest rate on debt (we'll just do avalanche method)
+- Ask for employer match + if they have access to roth, traditional, both or neither 401k in income
 - dashboard (make it update assets and goals as time goes on)
-- Option for user to do avalanche or snowball - descriptions of each with pros and cons included.
 - Check if I ever even use the insert methods or just update
-- Make the UI look nicer (use st.form for debt_df and expense_df later)
+- Make the UI look nicer (use st.form for debt_df and expense_df later) - also go and change lots of st.write to be f"{}" format
 - Write out sql_table_creation.sql
+- maybe add a questions and answers/useful tools or explanations / help page. 
 
 
 

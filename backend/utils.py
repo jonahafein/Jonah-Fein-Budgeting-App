@@ -82,19 +82,20 @@ def calculate_monthly_take_home(single: bool, annual_income, trad_401k_contribut
             medicare_cost = medicare_cost_over_250k + medicare_cost_under_250k
     
     # state and local taxes
-    state_tax = annual_taxable_income_non_federal*state_tax_perc
-    local_tax = annual_taxable_income_non_federal*local_tax_perc
+    state_tax = annual_taxable_income_non_federal*(state_tax_perc/100)
+    local_tax = annual_taxable_income_non_federal*(local_tax_perc/100)
     
     # total annual tax
     annual_tax = annual_federal_income_tax + ss_costs + medicare_cost + state_tax + local_tax
     # monthly take home
     return (annual_income/12) - (annual_tax/12)
-    
-    
+      
 
 def calculate_monthly_margin(monthly_take_home, expenses_df):
-    # TODO: implement
-    pass
+    if expenses_df is None or expenses_df.empty:
+        return monthly_take_home
+    expense_total = expenses_df["amount"].sum()
+    return round(monthly_take_home - expense_total,2)
 
 def calculate_net_worth():
     # TODO: implement
