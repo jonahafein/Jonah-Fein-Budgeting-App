@@ -123,12 +123,12 @@ class Database:
     def get_income(self, user_id):
         conn = self.get_conn()
         cursor = conn.cursor()
-        cursor.execute("SELECT annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match FROM income WHERE user_id = ?", user_id)
+        cursor.execute("SELECT annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status FROM income WHERE user_id = ?", user_id)
         row = cursor.fetchone()
         cursor.close()
         conn.close()
         if row:
-            return {"annual_income": float(row[0]) if row[0] is not None else 0, "annual_bonus": float(row[1]) if row[1] is not None else 0, "state_tax_perc": float(row[2]) if row[2] is not None else 0, "local_tax_perc": float(row[3]) if row[3] is not None else 0, "marriage_status": row[4] if row[4] else "single", "employer_match": float(row[5] if row[5] else 0)}
+            return {"annual_income": float(row[0]) if row[0] is not None else 0, "annual_bonus": float(row[1]) if row[1] is not None else 0, "state_tax_perc": float(row[2]) if row[2] is not None else 0, "local_tax_perc": float(row[3]) if row[3] is not None else 0, "marriage_status": row[4] if row[4] else "single"}
         else:
             return None
         
@@ -210,24 +210,27 @@ class Database:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM debt WHERE user_id = ?", user_id)
         for _, row in debt_df.iterrows():
+            # skip bad rows
+            if pd.isna(row["Balance"]) or pd.isna(row["Interest Rate"]) or not row["Item"] or str(row["Item"]).strip() == "":
+                continue
             cursor.execute("INSERT INTO debt (user_id, debt_item, debt_balance, debt_interest) VALUES (?, ?, ?, ?)", user_id,
                            row["Item"], row["Balance"], row["Interest Rate"])
         conn.commit()
         cursor.close()
         conn.close()
         
-    def update_income(self, user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match):
+    def update_income(self, user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status):
         conn = self.get_conn()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM income WHERE user_id = ?", user_id)
         exists = cursor.fetchone()[0]
         
         if exists > 0:
-            cursor.execute("UPDATE income SET annual_income = ?, annual_bonus = ?, state_tax_perc = ?, local_tax_perc = ?, marriage_status = ?, employer_match = ? WHERE user_id = ?",
-                       annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match, user_id)
+            cursor.execute("UPDATE income SET annual_income = ?, annual_bonus = ?, state_tax_perc = ?, local_tax_perc = ?, marriage_status = ? WHERE user_id = ?",
+                       annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, user_id)
         else:
-            cursor.execute("INSERT INTO income (user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                       user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match)
+            cursor.execute("INSERT INTO income (user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status)
         conn.commit()
         cursor.close()
         conn.close() 

@@ -100,8 +100,3 @@ def calculate_monthly_margin(monthly_take_home, expenses_df):
 def calculate_net_worth(home_value, home_debt, savings, brokerage, retirement, debt_total):
     home_equity = home_value - home_debt
     return home_equity + savings + brokerage + retirement - debt_total
-
-
-def calculate_net_worth_hypotheticals():
-    # TODO: implement
-    pass

@@ -32,7 +32,6 @@ if "income_loaded" not in st.session_state:
     state_tax_perc = income["state_tax_perc"] if income else 0
     local_tax_perc = income["local_tax_perc"] if income else 0
     marriage_status = income["marriage_status"] if income else "single"
-    employer_match = income["employer_match"] if income else 0
     expenses_df = db.get_expenses(user_id)
     
     st.session_state.annual_income = annual_income if annual_income else 0
@@ -40,7 +39,6 @@ if "income_loaded" not in st.session_state:
     st.session_state.state_tax_perc = state_tax_perc if state_tax_perc else 0
     st.session_state.local_tax_perc = local_tax_perc if local_tax_perc else 0
     st.session_state.marriage_status = marriage_status if marriage_status else "single"
-    st.session_state.employer_match = employer_match if employer_match else 0
     if expenses_df:
         st.session_state.expenses_df = pd.DataFrame([{
             "category": expense["category"],
@@ -53,6 +51,7 @@ if "expenses_df" not in st.session_state:
     st.session_state.expenses_df = pd.DataFrame(columns = ["category", "amount"])
     
 st.title("Income and Expenses")
+st.write("Make sure to save any changes made.")
 
 # initialize expenses_df if not there
 if "expenses_df" not in st.session_state:
@@ -72,8 +71,6 @@ if st.session_state.email:
     st.session_state.local_tax_perc = local_tax_perc
     marriage_status = st.radio("What is your marriage status?", ["single", "married"])
     st.session_state.marriage_status = marriage_status
-    employer_match = st.number_input("What dollar amount will your employer match you for your 401k?", value = float(st.session_state.employer_match))
-    st.session_state.employer_match = employer_match
     
     st.write("Please all of your monthly expenses. Include rent/mortgage, property taxes, debt minimum payments, and all other required expenses. You may also include fun spending or any other category that you will allocate as an expense.")
     if 'expenses_df' not in st.session_state:
@@ -87,11 +84,15 @@ if st.session_state.email:
         
     if st.button("Add Expense"):
         if category:
-            st.session_state.expenses_df.loc[len(st.session_state.expenses_df)] = [category, amount]
+            st.session_state.expenses_df.loc[len(st.session_state.expenses_df)] = [category, amount, False]
         else:
             st.warning("Please enter an expense")
             
     st.write("### Monthly Expenses:", st.session_state.expenses_df)
+    st.session_state.expenses_df["Delete"] = False
+    st.write("Edit or delete expenses here:")
+    st.session_state.expenses_df = st.data_editor(st.session_state.expenses_df, num_rows = "dynamic", use_container_width=True)
+    st.session_state.expenses_df = st.session_state.expenses_df[st.session_state.expenses_df["Delete"] == False]
     if st.button("Save Income and Expenses"):
         st.session_state.profile = {
             "email": email,
@@ -100,12 +101,15 @@ if st.session_state.email:
             "state_tax_perc": state_tax_perc,
             "local_tax_perc": local_tax_perc,
             "marriage_status": marriage_status,
-            "employer_match": employer_match,
             "expenses_df": st.session_state.expenses_df if not st.session_state.expenses_df.empty else None
         }
         # TODO: make the update methods
         db = Database()
         user_id = db.get_user(email)["user_id"]
-        db.update_income(user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, employer_match)
-        db.update_expenses(user_id, st.session_state.expenses_df)
+        db.update_income(user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status)
+        df = st.session_state.expenses_df.copy()
+        df = df.replace("", None)
+        df["amount"] = pd.to_numeric(df["amount"], errors="coerce")
+        df = df.dropna(subset=["category", "amount"])
+        db.update_expenses(user_id, df)
         st.success("Income and Expenses Saved!")

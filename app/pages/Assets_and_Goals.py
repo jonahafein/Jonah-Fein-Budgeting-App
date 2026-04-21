@@ -59,6 +59,7 @@ if "loaded" not in st.session_state:
     
 
 st.title("Assets and Goals")
+st.write("Make sure to save any changes made.")
 
 # initialize debt_df if not there
 if "debt_df" not in st.session_state:
@@ -150,7 +151,7 @@ if st.session_state.email:
         monthly_other = st.number_input("Estimate how many dollars a month you will need to put away for your other category:", key = "monthly_other")
     
     
-    st.write("List all of your non-mortgage debts:")
+    st.write("Add debt items here:")
     if 'debt_df' not in st.session_state:
         st.session_state.debt_df = pd.DataFrame(columns = ["Item", "Balance", "Interest Rate"])
     
@@ -168,8 +169,12 @@ if st.session_state.email:
         else:
             st.warning("Please enter an item")
             
-    st.write("### Debt:", st.session_state.debt_df)
-                
+    st.write("### Your Debt:", st.session_state.debt_df)
+    st.session_state.debt_df["Delete"] = False
+    st.write("Edit or delete debt item's here:")
+    st.session_state.debt_df = st.data_editor(st.session_state.debt_df, num_rows = "dynamic", use_container_width=True)
+    st.session_state.debt_df = st.session_state.debt_df[st.session_state.debt_df["Delete"] == False]
+       
     if st.button("Save Assets and Goals"):
         st.session_state.profile = {
             "email": email,
@@ -197,7 +202,12 @@ if st.session_state.email:
             db.delete_home(user_id)
         goals = list(st.session_state.goals)
         db.update_goals(user_id, goals)
-        db.update_debts(user_id, st.session_state.debt_df)
+        df = st.session_state.debt_df.copy()
+        df = df.replace("", None)
+        df["Balance"] = pd.to_numeric(df["Balance"], errors="coerce")
+        df["Interest Rate"] = pd.to_numeric(df["Interest Rate"], errors="coerce")
+        df = df.dropna(subset=["Item", "Balance", "Interest Rate"])
+        db.update_debts(user_id, df)
         st.success("Assets and Goals Saved!")
         st.session_state.home_data = db.get_home(user_id)
     
