@@ -1,5 +1,6 @@
 import streamlit as st 
 import pandas as pd
+import numpy as np
 import sys
 import os
 
@@ -17,8 +18,7 @@ if not st.session_state.get("email"):
 
 st.title("Account Dashboard")
 
-st.write("Please fill out the other two pages fully before returning here for best results. Also, please wait a few seconds for this dashboard to load.")
-st.subheader(f"Account insights for {st.session_state.email}:")
+st.write("Fill out the other two pages fully before returning here for best results. Refer to the help page for assistance, logic behind reccomendations, concept explanations, and additional resources. Please wait a few seconds for this dashboard to load.")
 
 # getting their user_id  
 db = Database()
@@ -52,7 +52,6 @@ if expenses_df:
         "category": expense["category"],
         "amount": expense["amount"]
     }for expense in expenses_df])
-    
 if "expenses_df" not in st.session_state:
     st.session_state.expenses_df = pd.DataFrame(columns = ["category", "amount"])
     
@@ -101,29 +100,77 @@ else:
     single = False
     
 total_income = st.session_state.annual_income + st.session_state.annual_bonus
+three_month_expenses = 3*(st.session_state.expenses_df["amount"].sum())
+six_month_expenses = 6*(st.session_state.expenses_df["amount"].sum())
 
+three_month_expenses_met = st.session_state.savings > three_month_expenses
+if three_month_expenses_met:
+    three_month_expenses_met = "✅"
+else:
+    three_month_gap = three_month_expenses - st.session_state.savings
+    three_month_expenses_met = f"❌ - {three_month_gap:,.2f} dollars away."
+six_month_expenses_met = st.session_state.savings > six_month_expenses
+if six_month_expenses_met:
+    six_month_expenses_met = "✅"
+else:
+    six_month_gap = six_month_expenses - st.session_state.savings
+    six_month_expenses_met = f"❌ - {six_month_gap:,.2f} dollars away."
+
+# determining if ready for step 4:
+continue_on_step4 = False 
+if st.session_state.debt_df and st.session_state.debt_df.empty and st.session_state.savings > three_month_expenses:
+    continue_on_step4 = True
+    
 # snapshot
 st.subheader("Your Current Finnancial Snapshot:")
 net_worth = utils.calculate_net_worth(home_value = st.session_state.home_value, home_debt = st.session_state.home_balance, savings = st.session_state.savings, brokerage = st.session_state.brokerage, retirement = st.session_state.retirement, debt_total = st.session_state.debt_df["Balance"].sum())
-st.write(f"Your current net worth is ${net_worth:.2f}")
-st.write("Your debt's are:")
-st.write(st.session_state.debt_df)   
+st.write(f"Net Worth: ${net_worth:,.2f}")
+# put some 401k slider in here
+st.write(f"Your monthly margin: ")
+# check or x if reached, if x by how much
+st.write(f"3 month emergency fund: ${three_month_expenses:,.2f}", three_month_expenses_met)
+st.write(f"6 month emergency fund: ${six_month_expenses:,.2f}", six_month_expenses_met)
+st.write(f"Your debt: ${st.session_state.debt_df["Balance"].sum()} with average interest: {np.average(st.session_state.debt_df['Interest Rate'], weights=st.session_state.debt_df['Balance']):,.2f}") 
 # for each of these, add an estimated time to completion for goals
 st.subheader("Reccomendations:")
+
+# baby step 1
 if st.session_state.savings < 1000:
-    st.write("We reccomend that for now, you pay minimum payments on all debt, pause investing (including for retirement), and put all of your monthly margin towards building a $1000 starter emergency fund.")
+    st.write("We reccomend that for now, you pause investing (including for retirement), and put all of your monthly margin towards building a $1000 starter emergency fund.")
     monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = total_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc)
     monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df)
-    st.write(f"Your monthly margin this month should be roughly {monthly_margin:.2f} dollars.")
+    st.write(f"Your monthly margin this month should be roughly {monthly_margin:,.2f} dollars (assuming no investing).")
+# baby step 2 
+# TODO: change to first reccomend using savings to get out of debt, and if that isnt enough then we use margin
 elif "debt_df" in st.session_state and not st.session_state.debt_df.empty and st.session_state.savings >= 1000:
     highest_interest_debt = st.session_state.debt_df.loc[st.session_state.debt_df['Interest Rate'].idxmax()]['Item'] 
     monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = total_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc)
     monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df)
-    st.write(f"We reccomend you temporarily pause all saving and investing (including retirement) and invest your entire monthly margin at your non-mortgage debt, starting with {highest_interest_debt} as it is your highest interest debt.")
-    st.write(f"Your monthly margin this month should be roughly ${monthly_margin:.2f} dollars.")
-    st.write(f"We also reccomend you take ${st.session_state.savings - 1000: .2f} from your savings and put in on your debt, again starting with {highest_interest_debt}")
-    
-# next build up to 6 months of emergency
+    if st.session_state.savings > 1000:
+        st.write(f"We reccomend you take ${st.session_state.savings - 1000:,.2f} from your savings and put in on your debt starting with {highest_interest_debt}.")
+        difference = st.session_state.savings - 1000
+        if difference < st.session_state.debt_df["Balance"].sum():
+            st.write(f"Next, we reccomend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at your non-mortgage debt, starting with {highest_interest_debt} as it is your highest interest debt.")
+            st.write(f"Your monthly margin this month should be roughly ${monthly_margin:,.2f} dollars (assuming no investing).")
+        elif difference >= st.session_state.debt_df["Balance"].sum() and difference < three_month_expenses:
+            st.write("You should be out of debt after that step!")
+            st.write("Now, we reccomend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
+            savings_remainder = st.session_state.savings - st.session_state.debt_df["Balance"].sum()
+            st.write(f"You should now have roughly ${savings_remainder:,.2f} savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}.")
+        else:
+            st.write("You should now be out of debt and have over three months of expenses saved!")
+            continue_on_step4 = True
+# baby step 3
+elif "debt_df" in st.session_state and st.session_state.debt_df.empty and st.session_state.savings < three_month_expenses:
+    monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = total_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc)
+    monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df)
+    st.write("We reccomend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
+    st.write(f"You current have ${st.session_state.savings:,.2f} in savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}, meaning you are {three_month_gap:,.2f} dollars away.")
+# next build up to 6 months of emergency, maybe now with option to choose agressiveness towards saving vs investing
+elif continue_on_step4:
+    # TODO: logic for house, logic for moving on to step 7 (will need bool defined above and mutable here), slider for investing aggression, saving up to 6 mo, etc.
+    pass
+
     
     
 
