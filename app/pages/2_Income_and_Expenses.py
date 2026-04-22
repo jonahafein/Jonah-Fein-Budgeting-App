@@ -32,6 +32,7 @@ if "income_loaded" not in st.session_state:
     state_tax_perc = income["state_tax_perc"] if income else 0
     local_tax_perc = income["local_tax_perc"] if income else 0
     marriage_status = income["marriage_status"] if income else "single"
+    months_worked = income["months_worked"] if income else 12
     expenses_df = db.get_expenses(user_id)
     
     st.session_state.annual_income = annual_income if annual_income else 0
@@ -39,6 +40,7 @@ if "income_loaded" not in st.session_state:
     st.session_state.state_tax_perc = state_tax_perc if state_tax_perc else 0
     st.session_state.local_tax_perc = local_tax_perc if local_tax_perc else 0
     st.session_state.marriage_status = marriage_status if marriage_status else "single"
+    st.session_state.months_worked = months_worked if months_worked else 12
     if expenses_df:
         st.session_state.expenses_df = pd.DataFrame([{
             "category": expense["category"],
@@ -48,7 +50,7 @@ if "income_loaded" not in st.session_state:
     st.session_state.income_loaded = True
 
 if "expenses_df" not in st.session_state:
-    st.session_state.expenses_df = pd.DataFrame(columns = ["category", "amount"])
+    st.session_state.expenses_df = pd.DataFrame(columns = ["category", "amount", "Delete"])
     
 st.title("Income and Expenses")
 st.write("Make sure to save any changes made.")
@@ -63,7 +65,9 @@ if st.session_state.email:
     # now get all the user inputs:
     annual_income = st.number_input("What is your annual base income?", value = float(st.session_state.annual_income))
     st.session_state.annual_income = annual_income
-    annual_bonus = st.number_input("What is your expected annual bonus?", value = float(st.session_state.annual_bonus))
+    months_worked = st.slider("How many months will you work this calendar year?", 1, 12, int(st.session_state.months_worked))
+    st.session_state.months_worked = months_worked
+    annual_bonus = st.number_input("What is your expected annual bonus this calendar year? (do not include if you start work mid year and will get a bonus next calendar year)", value = float(st.session_state.annual_bonus))
     st.session_state.annual_bonus = annual_bonus
     state_tax_perc = st.number_input("What is your state income tax %?", value = float(st.session_state.state_tax_perc))
     st.session_state.state_tax_perc = state_tax_perc
@@ -97,6 +101,7 @@ if st.session_state.email:
         st.session_state.profile = {
             "email": email,
             "annual_income": annual_income,
+            "months_worked": months_worked,
             "annual_bonus": annual_bonus,
             "state_tax_perc": state_tax_perc,
             "local_tax_perc": local_tax_perc,
@@ -106,7 +111,7 @@ if st.session_state.email:
         # TODO: make the update methods
         db = Database()
         user_id = db.get_user(email)["user_id"]
-        db.update_income(user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status)
+        db.update_income(user_id, annual_income, annual_bonus, state_tax_perc, local_tax_perc, marriage_status, months_worked)
         df = st.session_state.expenses_df.copy()
         df = df.replace("", None)
         df["amount"] = pd.to_numeric(df["amount"], errors="coerce")
