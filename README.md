@@ -13,8 +13,15 @@ TODO/Ideas:
 - Ask for age (FIX: allow further back inputs) √
 - Ask single or married (need to update income table + db methods) - should be done but need to test √
 - IMPORTANT: ability for user to edit debt_df (change values or delete items) - same thing for expenses √(Need to test for debt) √
-- IMPORTANT: edge case of user starts job mid year so annual income (for tax sake) doesn't align with monthly income for margin sake
+- IMPORTANT: edge case of user starts job mid year so annual income (for tax sake) doesn't align with monthly income for margin sake √
 - util methods for dashboard √
+- add savings into projects with apy and expected inflation
+- maybe make a 2nd page a guide/how to use page
+- IMPORTANT: Fix monthly margin bug. Margin is going up as trad 401k contributions goes up to no end. √
+- IMPORTANT - step 4-6 reccomendations, then step 7 recs
+- Have mortgage load as an expense automatically possibly
+- Make max values exactly what they can be
+- If user exceeds 6 mo emergency, show the surplus so they know regular savings
 - Could have a taxes page showing how much to pay each month and avoid big refund or owing tons
 - Give time estimates to goals in dashboard
 - Need to account for interest rate on debt (we'll just do avalanche method)
@@ -32,6 +39,7 @@ TODO/Ideas:
 - Make the UI look nicer (use st.form for debt_df and expense_df later) - also go and change lots of st.write to be f"{}" format
 - Write out sql_table_creation.sql
 - maybe add a questions and answers/useful tools or explanations / help page. - also sources and reccomendation logic. 
+- Eventually could have a progress over time page or add on to dashboard - would require selecting date and adding to azure
 
 
 
