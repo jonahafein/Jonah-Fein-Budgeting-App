@@ -144,8 +144,13 @@ class Database:
         else:
             return []  
         
+    def get_dashboard():
+        # TODO: implement
+        pass
+        
         
     # function for all:
+    # I don't think I use this, and I haven't updated it 
     def get_profile(self, user_id):
         return{
             "non_home_assets": self.get_non_home_assets(user_id),
@@ -253,6 +258,10 @@ class Database:
         conn.commit()
         cursor.close()
         conn.close()
+        
+    def update_dashboard():
+        # TODO: implement
+        pass
         
              
         
