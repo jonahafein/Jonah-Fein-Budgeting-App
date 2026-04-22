@@ -58,6 +58,8 @@ if "expenses_df" not in st.session_state:
     
 months_worked = max(st.session_state.months_worked, 1)
 st.session_state.months_worked = months_worked 
+
+# add all else to session_state
     
 # now let's load assets and goals:
 assets = db.get_non_home_assets(user_id)
@@ -247,6 +249,22 @@ if continue_on_step4:
     st.write(f"You will have approximately ${total_in_brokerage_nominal:,.2f} nominal in your brokerage when you liquidate. That is the equivalent of ${total_in_brokerage_real:,.2f} today's value if we assume inflation will average 4% annually.")
     #st.error if we go above margin (ADD in to above)
     st.write(f"Under this plan, after all investing you will have ${monthly_margin - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly:,.2f} for savings or further spending.")
+    future_savings_view = st.slider("How many months ahead would you like to look at your expected savings total?", max_value = 700)
+    P = st.session_state.savings
+    r_nominal = (st.session_state.apy / 100) / 12
+    r_real = ((1 + st.session_state.apy/100) / (1 + 0.04)) - 1
+    r_real = r_real / 12
+    t = future_savings_view
+    PMT = monthly_margin - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly
+    if r_nominal == 0:
+        total_in_savings_nominal = P + t*PMT
+    else:
+        total_in_savings_nominal = P * (1 + r_nominal)**t + PMT * (((1 + r_nominal)**t - 1) / r_nominal)
+    if r_real == 0:
+        total_in_savings_real = P + PMT * t
+    else:
+        total_in_savings_real = P * (1 + r_real)**t + PMT * (((1 + r_real)**t - 1) / r_real)
+    st.write(f"In {future_savings_view} months,  you will have approximately ${total_in_savings_nominal:,.2f}. That is the equivalent of ${total_in_savings_real:,.2f} today's value.")
 else:
     st.write("NOTE: This section will be left blank for now until you are fully out of debt and have built up at least 3 months of expenses saved.")
 
