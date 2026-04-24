@@ -2,3 +2,4 @@ streamlit
 pyodbc
 pandas
 azure-identity
+groq

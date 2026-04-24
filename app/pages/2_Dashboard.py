@@ -206,7 +206,7 @@ if st.session_state.savings < 1000:
     st.write("We recommend that for now, you pause investing (including for retirement), and put all of your monthly margin towards building a $1000 starter emergency fund.")
     monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
     monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
-    st.write(f"Your monthly margin this month should be roughly {monthly_margin:,.2f} dollars (assuming no investing).")
+    st.write(f"Your monthly margin this month should be roughly {monthly_margin:,.2f} dollars (assuming no investing). It should take you about {max((1000-st.session_state.savings)/max(monthly_margin,1),1)} months to achieve this.")
 # baby step 2 
 # TODO: change to first recommend using savings to get out of debt, and if that isnt enough then we use margin
 elif "debt_df" in st.session_state and not st.session_state.debt_df.empty and st.session_state.savings >= 1000:
@@ -218,12 +218,12 @@ elif "debt_df" in st.session_state and not st.session_state.debt_df.empty and st
         difference = st.session_state.savings - 1000
         if difference < st.session_state.debt_df["Balance"].sum():
             st.write(f"Next, we recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at your non-mortgage debt, starting with {highest_interest_debt} as it is your highest interest debt.")
-            st.write(f"Your monthly margin this month should be roughly ${monthly_margin:,.2f} dollars (assuming no investing).")
+            st.write(f"Your monthly margin this month should be roughly ${monthly_margin:,.2f} dollars (assuming no investing). It should take you about {max((max(st.session_state.debt_df["Balance"].sum() - difference),0)/max(monthly_margin,1), 1):,.2f} months to be out of debt.")
         elif difference >= st.session_state.debt_df["Balance"].sum() and difference < three_month_expenses:
             st.write("You should be out of debt after that step!")
             st.write("Now, we recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
             savings_remainder = st.session_state.savings - st.session_state.debt_df["Balance"].sum()
-            st.write(f"You should now have roughly ${savings_remainder:,.2f} savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}.")
+            st.write(f"You should now have roughly ${savings_remainder:,.2f} savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}. It should take you roughly {max((three_month_expenses - savings_remainder)/max(monthly_margin,1), 1):.2f} months to have 3 months of expenses saved.")
         else:
             st.write("You should now be out of debt and have over three months of expenses saved!")
 # baby step 3
@@ -231,7 +231,7 @@ elif "debt_df" in st.session_state and st.session_state.debt_df.empty and st.ses
     monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
     monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
     st.write("We recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
-    st.write(f"You current have ${st.session_state.savings:,.2f} in savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}, meaning you are {three_month_gap:,.2f} dollars away.")
+    st.write(f"You current have ${st.session_state.savings:,.2f} in savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}, meaning you are {three_month_gap:,.2f} dollars away. It should take you about {max(three_month_gap/max(monthly_margin,1), 1):.2f} months to reach this goal.")
 # next build up to 6 months of emergency, maybe now with option to choose agressiveness towards saving vs investing
 elif continue_on_step4:
     # TODO: logic for house, logic for moving on to step 7 (will need bool defined above and mutable here), slider for investing aggression, saving up to 6 mo, etc.
@@ -336,6 +336,7 @@ if continue_on_step4:
         total_in_retirement_real = P * (1 + r_real)**t + PMT * (((1 + r_real)**t - 1) / r_real)
     st.write(f"You will have approximately ${total_in_retirement_nominal:,.2f} nominal in retirement when you retire. That is the equivalent of ${total_in_retirement_real:,.2f} today's value if we assume inflation will average 4% annually.")
     # now brokerage, and remainder savings
+    st.write(f"Margin left after retirement investing: ${monthly_margin - roth_ira_monthly - roth_401k_contributions_monthly:,.2f}")
     brokerage_contributions_monthly = st.slider("How much will you put into a your brokerage monthly?", max_value=int(monthly_margin - roth_ira_monthly - roth_401k_contributions_monthly), step=1, value = st.session_state.brokerage_contributions_monthly)
     years_from_brokerage = st.slider("Approximately how much years are you from liquidating your brokerage?", value = st.session_state.years_from_brokerage)
     P = st.session_state.brokerage

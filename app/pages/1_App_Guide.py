@@ -7,8 +7,10 @@ This app is designed to help users optimize their finances in a simple and intui
 
 The app is best used at the beginning of each month to organize your budget and decide how to allocate your available margin. However, you can use it as frequently or infrequently as you’d like.
 
-**NOTE:** I am not a financial or tax expert. I've spent a bit of time researching personal finances, and the logic and recommendations used in this app are based on what I am choosing to do with my personal finances. 
-If you want to use your own strategy or play with a different set of assumptions (e.g., I assume 4% inflation average to be conservative), then simply edit the logic and rerun the app.
+**NOTE**: I am not a financial or tax expert. I've done a bit of personal finance research, and the logic and recommendations used in this app are based on what I am choosing to do with my personal finances. 
+
+If at any point you are stuck or need anything clarified, the help page has an ai chatbot to assist you!
+
 ---
 
 ## Getting Started
