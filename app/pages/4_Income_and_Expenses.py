@@ -67,7 +67,7 @@ if st.session_state.email:
     st.session_state.annual_income = annual_income
     months_worked = st.slider("How many months will you work this calendar year?", 1, 12, int(st.session_state.months_worked))
     st.session_state.months_worked = months_worked
-    annual_bonus = st.number_input("What is your expected annual bonus this calendar year? (do not include if you start work mid year and will get a bonus next calendar year)", value = float(st.session_state.annual_bonus))
+    annual_bonus = st.number_input("What is your expected annual bonus this calendar year? (do not include if you start work mid year and will get a bonus next calendar year). If you don't know, you can wait until you get your bonus to add.", value = float(st.session_state.annual_bonus))
     st.session_state.annual_bonus = annual_bonus
     state_tax_perc = st.number_input("What is your state income tax %?", value = float(st.session_state.state_tax_perc))
     st.session_state.state_tax_perc = state_tax_perc

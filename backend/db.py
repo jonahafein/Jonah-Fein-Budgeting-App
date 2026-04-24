@@ -144,9 +144,15 @@ class Database:
         else:
             return []  
         
-    def get_dashboard():
-        # TODO: implement
-        pass
+    def get_dashboard(self, user_id):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view from dashboard where user_id = ?", user_id)
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if row:
+            return{"trad_401k_contributions": row[0] if row[0] is not None else 0, "trad_401k_match_annual": row[1] if row[1] is not None else 0, "roth_ira_monthly": row[2] if row[2] is not None else 0, "roth_401k_contributions_monthly": row[3] if row[3] is not None else 0, "roth_401k_match_monthly": row[4] if row[4] is not None else 0, "years_from_retirement": row[5] if row[5] is not None else 0, "brokerage_contributions_monthly": row[6] if row[6] is not None else 0, "years_from_brokerage": row[7] if row[7] is not None else 0, "future_savings_view": row[8] if row[8] is not None else 0}
         
         
     # function for all:
@@ -259,9 +265,20 @@ class Database:
         cursor.close()
         conn.close()
         
-    def update_dashboard():
-        # TODO: implement
-        pass
+    def update_dashboard(self, user_id, trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view):
+        conn = self.get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM dashboard WHERE user_id = ?", user_id)
+        exists = cursor.fetchone()[0]
+        if exists > 0:
+            cursor.execute("UPDATE dashboard SET trad_401k_contributions = ?, trad_401k_match_annual = ?, roth_ira_monthly = ?, roth_401k_contributions_monthly = ?, roth_401k_match_monthly = ?, years_from_retirement = ?, brokerage_contributions_monthly = ?, years_from_brokerage = ?, future_savings_view = ? WHERE user_id = ?", trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view, user_id)
+        else:
+            cursor.execute("INSERT INTO dashboard (user_id, trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", user_id, trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view)
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        
         
              
         
