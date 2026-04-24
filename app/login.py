@@ -16,7 +16,7 @@ if "email" not in st.session_state:
     st.session_state.user_id = None
     st.session_state.birthdate = None
     
-email_input = st.text_input("Enter your email address")
+email_input = st.text_input("Enter your email")
 birthdate = st.date_input("Enter your birthdate")
 
 if st.button("Start"):

@@ -14,11 +14,11 @@ TODO/Ideas:
 - Check if I ever even use the insert methods or just update
 - Add buckets savings (for specific things)
 - Savings buckets/goals
+- maybe give ai helper tax info
 - Projections could include time frame for getting out of debt for those in debt, also time frame for savings goals/buckets
 - Link the azure login in the login page
 - When user clicks open app, streamlit starts running automatically and when close, streamlit stops automatically
-- Add a free LLM for recs + insights
-- For recs, find areas to cut costs maybe? - ai insights?
+- have some check for negative monthly margin with warning user must fix (income up expenses down)
 - Make it track month by month (could do beginning or end of the month or both)
 - Make the UI look nicer (use st.form for debt_df and expense_df later) - also go and change lots of st.write to be f"{}" format
 - Write out sql_table_creation.sql
