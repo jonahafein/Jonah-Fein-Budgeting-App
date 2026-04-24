@@ -34,7 +34,7 @@ if "loaded" not in st.session_state:
     
     # next set the session state 
     st.session_state.savings = assets["savings"] if assets else 0
-    st.session_state.apy = assets["apy"] if assets else 0
+    st.session_state.apy = float(assets["apy"]) if assets and assets["apy"] is not None else 0.0
     st.session_state.brokerage = assets["brokerage"] if assets else 0
     st.session_state.brokerage_returns = assets["brokerage_returns"] if assets else 0
     st.session_state.retirement = assets["retirement"] if assets else 0
@@ -76,15 +76,15 @@ if st.session_state.email:
     # now we allow for inputs and updated session state - will have update methods used later
     savings = st.number_input("Savings:", value = st.session_state.savings)
     st.session_state.savings = savings
-    apy = st.number_input("Apy:", value = st.session_state.apy, step=0.01, format="%.2f")
+    apy = st.number_input("Apy:", value = float(st.session_state.apy), step=0.01, format="%.2f")
     st.session_state.apy = apy
     brokerage = st.number_input("Brokerage:", value = st.session_state.brokerage)
     st.session_state.brokerage = brokerage
-    brokerage_returns = st.number_input("Brokerage expected returns:", value = st.session_state.brokerage_returns, step=0.01, format="%.2f")
+    brokerage_returns = st.number_input("Brokerage expected returns:", value = float(st.session_state.brokerage_returns), step=0.01, format="%.2f")
     st.session_state.brokerage_returns = brokerage_returns
     retirement = st.number_input("Retirement:", value = st.session_state.retirement)
     st.session_state.retirement = retirement
-    retirement_returns = st.number_input("Retirement expected returns:", value = st.session_state.retirement_returns, step=0.01, format="%.2f")
+    retirement_returns = st.number_input("Retirement expected returns:", value = float(st.session_state.retirement_returns), step=0.01, format="%.2f")
     st.session_state.retirement_returns = retirement_returns
 
     home_exists = True if home_data else False
@@ -109,7 +109,7 @@ if st.session_state.email:
                 home_balance = st.number_input("What is the remaining balance?", value = st.session_state.get("home_balance", home_data["balance"] if home_data else 0))
                 st.session_state.home_balance = home_balance
             with col3:
-                home_interest = st.number_input("What is the interest rate? (If variable, give an average)", value = st.session_state.get("home_interest", home_data["interest"] if home_data else 0), step=0.01, format="%.2f")
+                home_interest = st.number_input("What is the interest rate? (If variable, give an average)", value = float(st.session_state.get("home_interest", home_data["interest"] if home_data else 0)), step=0.01, format="%.2f")
                 st.session_state.home_interest = home_interest
             with col4:
                 fees = st.number_input("Typical monthly non-mortgage house costs?", value = st.session_state.get("fees", home_data["fees"] if home_data else 0))  
@@ -161,7 +161,7 @@ if st.session_state.email:
     with col2:
         balance = st.number_input("Enter debt balance", key = "balance")
     with col3:
-        interest = st.number_input("Enter interest rate:", key = "interest", step=0.01, format="%.2f")
+        interest = st.number_input("Enter interest rate:", value=0.0, key = "interest", step=0.01, format="%.2f")
         
     if st.button("Add Debt"):
         if item:
