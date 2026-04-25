@@ -218,12 +218,12 @@ elif "debt_df" in st.session_state and not st.session_state.debt_df.empty and st
         difference = st.session_state.savings - 1000
         if difference < st.session_state.debt_df["Balance"].sum():
             st.write(f"Next, we recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at your non-mortgage debt, starting with {highest_interest_debt} as it is your highest interest debt.")
-            st.write(f"Your monthly margin this month should be roughly ${monthly_margin:,.2f} dollars (assuming no investing). It should take you about {max((max(st.session_state.debt_df["Balance"].sum() - difference),0)/max(monthly_margin,1), 1):,.2f} months to be out of debt.")
+            st.write(f"Your monthly margin this month should be roughly ${monthly_margin:,.2f} dollars (assuming no investing). It should take you about {max((max(st.session_state.debt_df["Balance"].sum() - difference),0)/max(monthly_margin,1), 1):,.0f} months to be out of debt.")
         elif difference >= st.session_state.debt_df["Balance"].sum() and difference < three_month_expenses:
             st.write("You should be out of debt after that step!")
             st.write("Now, we recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
             savings_remainder = st.session_state.savings - st.session_state.debt_df["Balance"].sum()
-            st.write(f"You should now have roughly ${savings_remainder:,.2f} savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}. It should take you roughly {max((three_month_expenses - savings_remainder)/max(monthly_margin,1), 1):.2f} months to have 3 months of expenses saved.")
+            st.write(f"You should now have roughly ${savings_remainder:,.2f} savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}. It should take you roughly {max((three_month_expenses - savings_remainder)/max(monthly_margin,1), 1):.0f} months to have 3 months of expenses saved.")
         else:
             st.write("You should now be out of debt and have over three months of expenses saved!")
 # baby step 3
@@ -231,7 +231,7 @@ elif "debt_df" in st.session_state and st.session_state.debt_df.empty and st.ses
     monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
     monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
     st.write("We recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
-    st.write(f"You current have ${st.session_state.savings:,.2f} in savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}, meaning you are {three_month_gap:,.2f} dollars away. It should take you about {max(three_month_gap/max(monthly_margin,1), 1):.2f} months to reach this goal.")
+    st.write(f"You current have ${st.session_state.savings:,.2f} in savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}, meaning you are {three_month_gap:,.2f} dollars away. It should take you about {max(three_month_gap/max(monthly_margin,1), 1):.0f} months to reach this goal.")
 # next build up to 6 months of emergency, maybe now with option to choose agressiveness towards saving vs investing
 elif continue_on_step4:
     # TODO: logic for house, logic for moving on to step 7 (will need bool defined above and mutable here), slider for investing aggression, saving up to 6 mo, etc.
@@ -263,7 +263,8 @@ elif continue_on_step4:
             st.write(f"Warning ⛔️: You are investing ${difference:,.2f} a month less than 15% of your monthly income. We recommend you close the gap.")
 
 st.write(f"We recommend you withhold approximately ${recommended_withholding:,.2f} per month for federal income tax (excludes state/local & FICA).")
-st.write(f"Estimated total tax on bonus (federal, state, FICA): ${bonus_taxes:,.2f}")
+if bonus_taxes > 0:
+    st.write(f"Estimated total tax on bonus (federal, state, FICA): ${bonus_taxes:,.2f}")
 st.write("See the tax optimization page for more tax details/recommendations.")
 
 st.subheader("Financial Projections:")
@@ -392,8 +393,9 @@ if continue_on_step4:
 else:
     if st.session_state.debt_df["Balance"].sum() > 0:
         st.write("NOTE: This section will be left blank for now until you are fully out of debt and have built up at least 3 months of expenses saved.")
-    elif st.session_state.debt_df["Balance"].sum() == 0 and three_month_expenses_met == False:
+    elif st.session_state.debt_df["Balance"].sum() == 0 and st.session_state.savings < three_month_expenses:
         st.write("NOTE: This section will be left blank for now until you have built up at least 3 months of expenses saved.")
+        
 
     
     
