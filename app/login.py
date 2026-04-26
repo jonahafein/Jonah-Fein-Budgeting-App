@@ -1,6 +1,7 @@
 import streamlit as st
 import sys
 import os
+import datetime 
 
 folder_path = os.path.abspath("/Users/jonahafein//Desktop/Python Projects/Jonah-Fein-Budgeting-App/backend")
 
@@ -17,7 +18,7 @@ if "email" not in st.session_state:
     st.session_state.birthdate = None
     
 email_input = st.text_input("Enter your email")
-birthdate = st.date_input("Enter your birthdate")
+birthdate = st.date_input("Enter your birthdate", min_value=datetime.date(1900, 1, 1))
 
 if st.button("Start"):
     if email_input:

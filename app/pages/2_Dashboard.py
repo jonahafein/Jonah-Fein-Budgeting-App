@@ -29,6 +29,10 @@ if not user:
     st.stop()
 
 user_id = user["user_id"]
+if user and user["birthdate"]:
+    st.session_state.birthdate = datetime.strptime(user["birthdate"], "%Y-%m-%d").date()
+else:
+    st.session_state.birthdate = None
 
 # bringing the full picture together
 
