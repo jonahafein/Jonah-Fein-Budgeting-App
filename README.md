@@ -4,10 +4,8 @@ This will be a manual budgeting app inspired by the Every Dollar app.
 Eventually it will (hopefully) not be manual.
 
 TODO/Ideas:
-- CHANGING DATABASE TO SUPABASE FOR AUTO LOGIN
 - Have mortgage load as an expense automatically possibly
-- Tax deduction for kids?
-- dashboard (make it update assets and goals as time goes on)
+- Tax deduction for kids + other deductions
 - Could do percentile of net worth for age or percentile of everything for age
 - Add buckets savings (for specific things)
 - Savings buckets/goals

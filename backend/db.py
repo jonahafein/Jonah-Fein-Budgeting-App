@@ -1,13 +1,12 @@
 import pandas as pd
 from azure import identity
 from supabase import create_client
-import config
 
 class Database:
     def __init__(self):
         self.supabase = create_client(
-            config.supabase_url,
-            config.publishable_key_supabase
+            st.secrets["supabase_url"],
+            st.secrets["publishable_key_supabase"]
         )
     
     def insert_user(self, email_input, birthdate):

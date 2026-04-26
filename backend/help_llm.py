@@ -1,5 +1,7 @@
 from groq import Groq
-from config import groq_api_key
+
+
+groq_api_key = st.secrets["groq_api_key"]
 
 SYSTEM_PROMPT = """
 You are an AI financial assistant embedded inside a personal budgeting app.
