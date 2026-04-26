@@ -4,10 +4,8 @@ import numpy as np
 import sys
 import os
 
-folder_path = os.path.abspath("/Users/jonahafein//Desktop/Python Projects/Jonah-Fein-Budgeting-App/backend")
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend")))
 
-if folder_path not in sys.path:
-    sys.path.append(folder_path)
 
 from db import Database
 import utils
