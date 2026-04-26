@@ -49,7 +49,7 @@ After updating, return to the dashboard to see:
 
 ## Additional Notes
 
-**I set that app up so that you are unable to use the financial projections section until you are
+**I set the app up so that you are unable to use the financial projections section until you are
 debt free and have at least 3 months of emergency savings. My logic is to force you to complete those 
 first before making plans for your future financial allocation.**
 
