@@ -5,10 +5,7 @@ import sys
 import os
 from datetime import datetime
 
-folder_path = os.path.abspath("/Users/jonahafein//Desktop/Python Projects/Jonah-Fein-Budgeting-App/backend")
-
-if folder_path not in sys.path:
-    sys.path.append(folder_path)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend")))
 
 from db import Database
 import utils

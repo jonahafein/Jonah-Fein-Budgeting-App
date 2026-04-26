@@ -3,10 +3,7 @@ import os
 import streamlit as st
 import pandas as pd
 
-folder_path = os.path.abspath("/Users/jonahafein//Desktop/Python Projects/Jonah-Fein-Budgeting-App/backend")
-
-if folder_path not in sys.path:
-    sys.path.append(folder_path)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend")))
     
 from help_llm import ai_helper
 from db import Database
