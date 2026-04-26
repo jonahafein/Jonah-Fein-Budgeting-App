@@ -394,7 +394,7 @@ else:
     if st.session_state.debt_df["Balance"].sum() > 0:
         st.write("NOTE: This section will be left blank for now until you are fully out of debt and have built up at least 3 months of expenses saved.")
     elif st.session_state.debt_df["Balance"].sum() == 0 and st.session_state.savings < three_month_expenses:
-        st.write("NOTE: This section will be left blank for now until you have built up at least 3 months of expenses saved.")
+        st.write("NOTE: This section will be left blank for now until you have built up at least 3 months of expenses saved. See additional notes for further explanation.")
         
 
     
