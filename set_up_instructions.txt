@@ -1,86 +1,57 @@
 To use this app, follow these instructions:
- 
+
 1. Clone this repository
 
-2. Create an Azure SQL Database
-Go to Azure Portal: https://portal.azure.com
-Search for “SQL Databases”
-Click Create
+2. Create a Supabase Project
+Go to: https://supabase.com
+Sign in and click “New Project”
 Fill in:
-Database name → budgeting_app_users (or anything)
-Server → Create new server
-Choose a name (e.g., budgeting-app-server)
-Choose a region (closest to you)
-You can fill admin login/password, but this app does NOT use it
-Compute + storage → Basic is fine
+Project name → budgeting-app (or anything)
+Database password → save this somewhere
 
-Click Review + Create
+Click Create and wait ~1–2 minutes
+Get API Credentials
+Go to: Project Settings → API
 
-3. Configure Microsoft Entra (Azure AD) Access
-This app uses Entra ID authentication (your school account).
-Step 1: Set yourself as Azure AD admin
-Go to your SQL Server (not database)
-Click “Microsoft Entra ID” (or “Azure AD”)
-Click Set Admin
-Select your student account
-Save
-Step 2: Allow your IP
-Go to your database → Networking
-Click Add current client IP
-Save
+Copy:
+Project URL
+Publishable (anon) key
+Add Config File
 
-4. Get Connection String
-Go to your database
-Click “Connection strings”
-Copy the ODBC connection string
-
-5. Add Connection String to Project
-Create:
+Create this file:
 backend/config.py
+
 Add:
-connection_string = "YOUR_CONNECTION_STRING_HERE"
-Next, go to https://console.groq.com/keys and create an
-account and get a groq api key.
-the next line in config should be
-groq_api_key = "YOUR_KEY_STRING_HERE"
-(refer to config example for help)
 
-6. Create Database Tables
-Go to Azure → your database
-Open Query Editor
-Log in with your Entra ID (school account)
-Paste the SQL script from this sql_table_creation.sql
-Click Run
+supabase_url = "https://YOUR_PROJECT_ID.supabase.co"
+publishable_key_supabase = "YOUR_ANON_KEY"
+Also add your Groq API key:
+groq_api_key = "YOUR_GROQ_KEY"
 
-7. Run Setup Script
+Get a Groq key here:
+https://console.groq.com/keys
+
+3. Create Database Tables
+Go to Supabase → SQL Editor
+Paste and run the SQL script from sql_table_creation.sql
+
+Disable Row Level Security:
+In Supabase SQL Editor, run:
+
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE dashboard DISABLE ROW LEVEL SECURITY;
+ALTER TABLE debt DISABLE ROW LEVEL SECURITY;
+ALTER TABLE expenses DISABLE ROW LEVEL SECURITY;
+ALTER TABLE goals DISABLE ROW LEVEL SECURITY;
+ALTER TABLE home DISABLE ROW LEVEL SECURITY;
+ALTER TABLE income DISABLE ROW LEVEL SECURITY;
+ALTER TABLE non_home_assets DISABLE ROW LEVEL SECURITY;
+
+4. Run Setup Script:
 chmod +x setup.sh
 ./setup.sh
 source venv/bin/activate
 
-This installs:
-
-Homebrew
-Python
-Azure CLI
-ODBC driver
-Required Python packages
-
-8. Azure Login
-In the same terminal you will run the app from, run:
-az login
-Log in with your student (Entra ID) account
-This step is required because the app uses:
-DefaultAzureCredential(...)
-which pulls credentials from Azure CLI.
-
-9. Run the App
+5. Run the App:
 cd app
 streamlit run Login.py
-
-NOTE: every time you want to use the app, make sure to log in to your
-azure student account first. Open the database and click on query editor 
-to make sure you are logged in. Then, go back to the terminal you run the app from
-and again, run:
-cd app
-streamlit run Login.py
-
