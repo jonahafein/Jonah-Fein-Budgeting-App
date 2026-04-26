@@ -110,7 +110,10 @@ st.write(f"NOTE: The following assumes you put ${trad_401k_contributions:,.2f} i
 st.subheader("Tax Overview:")
 st.write(f"Your federally taxable income (before bonus) based on a standard deduction of {standard_deduction} is approximately ${salary_taxable:,.2f}.")
 st.write(f"This means you owe approximately ${salary_federal_tax:,.2f} in federal income tax (not including bonus), giving you a monthly average of ${float(salary_federal_tax/months_worked):,.2f}")
-effective_tax_rate = float(annual_taxes_no_bonus/salary_income_prorated)
+if salary_income_prorated > 0:
+    effective_tax_rate = float(annual_taxes_no_bonus/salary_income_prorated)
+else:
+    effective_tax_rate = 0.0
 st.write(f"Your estimated effective total tax rate (not including bonus) is approximately {effective_tax_rate:.2%}.")
 ss_costs = utils.calculate_ss_annual(actual_income = salary_income_prorated)
 medicare_costs = utils.calculate_medicare_costs(single = single, actual_income = salary_income_prorated)
