@@ -5,8 +5,8 @@ import pandas as pd
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend")))
     
-from help_llm import ai_helper
-from db import Database
+from backend.help_llm import ai_helper
+from backend.db import Database
 
 if not st.session_state.get("email"):
     st.warning("Please log in first")

@@ -1,5 +1,4 @@
 import pandas as pd
-from azure import identity
 from supabase import create_client
 
 class Database:

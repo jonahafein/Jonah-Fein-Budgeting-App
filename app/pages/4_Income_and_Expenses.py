@@ -5,7 +5,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend")))
 
-from db import Database
+from backend.db import Database
 
 if not st.session_state.get("email"):
     st.warning("Please log in first")

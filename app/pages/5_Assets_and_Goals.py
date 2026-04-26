@@ -5,7 +5,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend")))
 
-from db import Database
+from backend.db import Database
 
 # making user enter email to log in first
 if not st.session_state.get("email"):

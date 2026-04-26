@@ -5,7 +5,7 @@ import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend")))
 
-from db import Database
+from backend.db import Database
 
 db = Database()
 
