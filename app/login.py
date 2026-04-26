@@ -2,7 +2,7 @@ import streamlit as st
 import sys
 import os
 import datetime 
-
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from backend.db import Database
 
 db = Database()
