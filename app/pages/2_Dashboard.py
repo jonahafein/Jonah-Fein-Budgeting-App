@@ -4,6 +4,7 @@ import numpy as np
 import sys
 import os
 from datetime import datetime
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from backend.db import Database
 import backend.utils

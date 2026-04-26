@@ -2,6 +2,7 @@ import sys
 import os
 import streamlit as st
 import pandas as pd
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
     
 from backend.help_llm import ai_helper
 from backend.db import Database
