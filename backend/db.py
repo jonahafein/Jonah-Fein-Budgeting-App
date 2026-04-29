@@ -86,6 +86,23 @@ class Database:
         
         return None
     
+    def get_settings(self, user_id):
+        res = self.supabase.table("settings") \
+            .select("debt_aggression, emergency_importance, investing_aggression, bonus_strategy") \
+            .eq("user_id", user_id) \
+            .execute()
+        
+        if res.data:
+            row = res.data[0]
+            return {
+                "debt_aggression": row["debt_aggression"] if row["debt_aggression"] is not None else "extremely",
+                "emergency_importance": row["emergency_importance"] if row["emergency_importance"] is not None else "extremely",
+                "investing_aggression": row["investing_aggression"] if row["investing_aggression"] is not None else "balanced",
+                "bonus_strategy": row["bonus_strategy"] if row["bonus_strategy"] is not None else "save"
+            }
+        
+        return None
+    
     def get_home(self, user_id):
         res = self.supabase.table("home") \
             .select("paid_off, home_value, years, balance, interest, fees") \
@@ -216,6 +233,15 @@ class Database:
             "retirement_returns": retirement_returns
         }).execute()
     
+    def update_settings(self, user_id, debt_aggression, emergency_importance, investing_aggression, bonus_strategy):
+        self.supabase.table("settings").upsert({
+            "user_id": user_id,
+            "debt_aggression": debt_aggression,
+            "emergency_importance": emergency_importance,
+            "investing_aggression": investing_aggression,
+            "bonus_strategy": bonus_strategy
+        }).execute()
+
     def update_home(self, user_id, paid_off, home_value, years, balance, interest, fees):
         self.supabase.table("home").upsert({
             "user_id": user_id,
