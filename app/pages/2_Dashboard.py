@@ -154,11 +154,13 @@ if "debt_df" in st.session_state and st.session_state.debt_df.empty and st.sessi
 # snapshot
 st.subheader("Your Current Financial Snapshot:")
 net_worth = utils.calculate_net_worth(home_value = st.session_state.home_value, home_debt = st.session_state.home_balance, savings = st.session_state.savings, brokerage = st.session_state.brokerage, retirement = st.session_state.retirement, debt_total = st.session_state.debt_df["Balance"].sum())
-st.write(f"Net Worth: ${net_worth:,.2f}")
 trad_401k_contributions = 0
 monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = trad_401k_contributions, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
 monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
-st.write(f"Your monthly margin (before any traditional 401k investing): ${monthly_margin}")
+st.write(f"Net Worth: ${net_worth:,.2f}")
+st.write(f"Monthly take home (before any traditional 401k investing): ${monthly_margin + st.session_state.expenses_df["Amount"].sum():,.2f}")
+st.write(f"Monthly Expenses: ${st.session_state.expenses_df["Amount"].sum():,.2f}")
+st.write(f"Monthly margin (before any traditional 401k investing): ${monthly_margin:,.2f}")
 
 # check or x if reached, if x by how much
 st.write(f"3 month emergency fund: ${three_month_expenses:,.2f}", three_month_expenses_met)
