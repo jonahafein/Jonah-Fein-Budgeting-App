@@ -83,24 +83,10 @@ st.session_state.brokerage_contributions_monthly = brokerage_contributions_month
 st.session_state.years_from_brokerage = years_from_brokerage if years_from_brokerage else 0
 st.session_state.future_savings_view = future_savings_view if future_savings_view else 0
 
-# settings:
-settings = db.get_settings(user_id)
-debt_aggression = settings["debt_aggression"] if settings else "extremely"
-emergency_importance = settings["emergency_importance"] if settings else "extremely"
-ai_permission = settings["ai_permission"] if settings else "no"
-investing_aggression = settings["investing_aggression"] if settings else "balanced"
-bonus_strategy = settings["bonus_strategy"] if settings else "save"
-
-st.session_state.debt_aggression = debt_aggression if debt_aggression else "extremely"
-st.session_state.emergency_importance = emergency_importance if emergency_importance else "extremely"
-st.session_state.ai_permission = ai_permission if ai_permission else "no"
-st.session_state.investing_aggression = investing_aggression if investing_aggression else "balanced"
-st.session_state.bonus_strategy = bonus_strategy if bonus_strategy else "save"
     
 # now let's load assets and goals:
 assets = db.get_non_home_assets(user_id)
 home_data = db.get_home(user_id)
-goals_df = db.get_goals(user_id)
 debt_df = db.get_debts(user_id)
 st.session_state.savings = assets["savings"] if assets else 0
 st.session_state.apy = assets["apy"] if assets else 0
@@ -131,13 +117,6 @@ if debt_df:
 else:
     st.session_state.debt_df = pd.DataFrame(columns = ["Item", "Balance", "Interest Rate"])
     
-if goals_df:
-    st.session_state.goals_df = pd.DataFrame([{
-        "goal_name": goal["goal_name"],
-        "target_amount": goal["target_amount"],
-        "timeline_years": goal["timeline_years"],
-        "priority": goal["priority"]
-    }for goal in goals_df])
     
 if st.session_state.marriage_status =="single":
     standard_deduction = 16100
@@ -165,9 +144,6 @@ if six_month_expenses_met:
 else:
     six_month_gap = six_month_expenses - st.session_state.savings
     six_month_expenses_met = f"❌ - {six_month_gap:,.2f} dollars away."
-    
-if "goals_df" not in st.session_state:
-    st.session_state.goals_df = pd.DataFrame(columns = ["goal_name", "target_amount", "timeline_years", "priority", "delete"])
 
 # determining if ready for step 4:
 continue_on_step4 = False 
