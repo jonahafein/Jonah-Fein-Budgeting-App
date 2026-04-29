@@ -204,7 +204,11 @@ elif "debt_df" in st.session_state and not st.session_state.debt_df.empty and st
     monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
     monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
     if st.session_state.savings > 1000:
-        st.write(f"We recommend you take ${st.session_state.savings - 1000:,.2f} from your savings and put in on your debt starting with {highest_interest_debt}.")
+        if st.session_state.savings - 1000 > st.session_state.debt_df["Balance"].sum():
+            money_for_debt = st.session_state.debt_df["Balance"].sum()
+        else:
+            money_for_debt = st.session_state.savings - 1000
+        st.write(f"We recommend you take ${money_for_debt:,.2f} from your savings and put in on your debt starting with {highest_interest_debt}.")
         difference = st.session_state.savings - 1000
         if difference < st.session_state.debt_df["Balance"].sum():
             st.write(f"Next, we recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at your non-mortgage debt, starting with {highest_interest_debt} as it is your highest interest debt.")
