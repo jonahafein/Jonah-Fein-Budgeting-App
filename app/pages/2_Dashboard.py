@@ -158,9 +158,9 @@ trad_401k_contributions = 0
 monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = trad_401k_contributions, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
 monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
 st.write(f"Net Worth: ${net_worth:,.2f}")
-st.write(f"Monthly take home (before any traditional 401k investing): ${monthly_margin + st.session_state.expenses_df["amount"].sum():,.2f}")
+st.write(f"Monthly Income After Tax (before any traditional 401k investing): ${monthly_margin + st.session_state.expenses_df["amount"].sum():,.2f}")
 st.write(f"Monthly Expenses: ${st.session_state.expenses_df["amount"].sum():,.2f}")
-st.write(f"Monthly margin (before any traditional 401k investing): ${monthly_margin:,.2f}")
+st.write(f"Monthly Margin (before any traditional 401k investing): ${monthly_margin:,.2f}")
 
 # check or x if reached, if x by how much
 st.write(f"3 month emergency fund: ${three_month_expenses:,.2f}", three_month_expenses_met)
