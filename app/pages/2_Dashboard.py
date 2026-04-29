@@ -400,7 +400,7 @@ if r_real == 0:
     total_in_savings_real = P + PMT * t
 else:
     total_in_savings_real = P * (1 + r_real)**t + PMT * (((1 + r_real)**t - 1) / r_real)
-st.write(f"In {future_savings_view} months,  you will have approximately ${total_in_savings_nominal:,.2f}. That is the equivalent of ${total_in_savings_real:,.2f} today's value.")
+st.write(f"In {future_savings_view} months,  you will have approximately ${total_in_savings_nominal:,.2f} saved. That is the equivalent of ${total_in_savings_real:,.2f} today's value.")
 
 remaining = real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly
 if remaining < 0:
