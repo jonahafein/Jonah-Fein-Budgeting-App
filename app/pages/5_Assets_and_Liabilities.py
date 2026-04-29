@@ -154,7 +154,12 @@ if st.session_state.email:
         
     if st.button("Add Debt"):
         if item:
-            st.session_state.debt_df.loc[len(st.session_state.debt_df)] = [item, balance, interest]
+            st.session_state.debt_df.loc[len(st.session_state.debt_df)] = {
+            "Item": item,
+            "Balance": balance,
+            "Interest Rate": interest,
+            "Delete": False
+        }
         else:
             st.warning("Please enter an item")
             
