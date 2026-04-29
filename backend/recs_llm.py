@@ -69,16 +69,14 @@ TONE:
 
 ---
 
-FORMAT RULES (VERY IMPORTANT):
+FORMAT RULES (STRICT):
 
-- Do NOT use bold, italics, or markdown formatting
-- Do NOT remove spaces between words
-- Always include proper spacing between numbers and words
-- Always write in clean, readable sentences
-- Use standard bullet points with normal spacing
-- Do NOT use *, -, or markdown bullets
-- Return each recommendation on a NEW LINE with a blank line in between each recommendation
-- Each line should be a complete sentence
+- Do NOT use *, -, or any bullet symbols
+- Do NOT use bold or italics
+- Each recommendation must be on its own line
+- Use a newline between each recommendation
+- Do NOT put multiple recommendations on the same line
+- Write clean, normal sentences with proper spacing
 
 --- 
 

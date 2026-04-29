@@ -14,23 +14,16 @@ import re
 
 def clean_text(text):
     import re
+    text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text) # bold
+    text = re.sub(r'\*([^*]+)\*', r'\1', text) # italics
+    
+    # remove stray bullet symbols
+    text = text.replace("*", "").replace("-", "")
+
+    # add spaces when missing
     text = re.sub(r'(\d)([A-Za-z])', r'\1 \2', text)
-    text = re.sub(r'([A-Za-z])(\d)', r'\1 \2', text)
-    # Fix camelCase
     text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
-    # REMOVE markdown formatting
-    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
-    text = re.sub(r'\*(.*?)\*', r'\1', text)
-    text = re.sub(r'_(.*?)_', r'\1', text)
-
-    # add spaces in long merged words
-    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)  # again just in case
-    text = re.sub(r'([a-z]{2,})([A-Z])', r'\1 \2', text)
-
-    # Add space before parentheses if missing
-    text = re.sub(r'([a-zA-Z])\(', r'\1 (', text)
-
-    # Fix multiple spaces
+    text = re.sub(r'([A-Za-z])(\d)', r'\1 \2', text)
     text = re.sub(r'\s+', ' ', text)
 
     return text.strip()
@@ -274,7 +267,13 @@ response = client.chat(
 
 recommendations = clean_text(response.choices[0].message.content)
 
+# split based on new lines
 lines = recommendations.split("\n")
+
+# fallback in case LLM ignores newline rule
+if len(lines) <= 1:
+    import re
+    lines = re.split(r'\.\s+', recommendations)
 
 for line in lines:
     line = line.strip()
