@@ -406,6 +406,31 @@ remaining = real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - ro
 if remaining < 0:
     st.error("You are allocating more than your available monthly margin.")
 
+if margin_on_debt_monthly == 0:
+    dashboard_df = pd.DataFrame({
+        "Annual Traditional 401k": trad_401k_contributions,
+        "Annual Traditional 401k Match": trad_401k_match_annual,
+        "Monthly Roth IRA Contributions": roth_ira_monthly,
+        "Monthly Roth 401k Contributions": roth_401k_contributions_monthly,
+        "Monthly Roth 401k Match": roth_401k_match_monthly,
+        "Monthly Brokerage Contributions": brokerage_contributions_monthly,
+        "Savings": real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly,
+    })
+else:
+    dashboard_df = pd.DataFrame({
+        "Monthly Debt Additional Contribution": margin_on_debt_monthly,
+        "Annual Traditional 401k": trad_401k_contributions,
+        "Annual Traditional 401k Match": trad_401k_match_annual,
+        "Monthly Roth IRA Contributions": roth_ira_monthly,
+        "Monthly Roth 401k Contributions": roth_401k_contributions_monthly,
+        "Monthly Roth 401k Match": roth_401k_match_monthly,
+        "Monthly Brokerage Contributions": brokerage_contributions_monthly,
+        "Savings": real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly,
+    })
+
+st.write("Current monthly margin allocation plan:")
+st.dataframe(dashboard_df) 
+
 if st.button("Save dashboard projections values"):
     st.session_state.profile = {
         "email": st.session_state.email,
