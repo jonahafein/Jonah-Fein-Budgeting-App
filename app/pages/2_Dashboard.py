@@ -416,7 +416,7 @@ if margin_on_debt_monthly == 0:
         "Monthly Brokerage Contributions": brokerage_contributions_monthly,
         "Savings": real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly,
     }
-    dashboard_df = pd.DataFrame(dashboard_dict)
+    dashboard_df = pd.DataFrame(dashboard_dict, index=[0])
 else:
     dashboard_dict = {
         "Monthly Debt Additional Contribution": margin_on_debt_monthly,
@@ -428,7 +428,7 @@ else:
         "Monthly Brokerage Contributions": brokerage_contributions_monthly,
         "Savings": real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly,
     }
-    dashboard_df = pd.DataFrame(dashboard_dict)
+    dashboard_df = pd.DataFrame(dashboard_dict, index=[0])
 
 st.write("Current monthly margin allocation plan:")
 st.dataframe(dashboard_df) 
