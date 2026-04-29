@@ -8,6 +8,7 @@ CREATE TABLE users (
 -- DASHBOARD
 CREATE TABLE dashboard (
     user_id INT PRIMARY KEY,
+    margin_on_debt_monthly INT,
     trad_401k_contributions INT,
     trad_401k_match_annual INT,
     roth_ira_monthly INT,
@@ -43,9 +44,11 @@ CREATE TABLE expenses (
 CREATE TABLE goals (
     goal_id SERIAL PRIMARY KEY,
     user_id INT,
-    goal TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    UNIQUE(user_id, goal)
+    goal_name TEXT,
+    target_amount NUMERIC(12,2),
+    timeline_years INT,
+    priority TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- HOME

@@ -116,6 +116,10 @@ if "data_loaded" not in st.session_state:
         single = True
     else:
         single = False
+    
+    settings = db.get_settings(user_id) 
+    ai_permission = settings["ai_permission"] if settings else "no"
+    st.session_state.ai_permission = ai_permission if ai_permission else "no"
         
     annual_income = st.session_state.annual_income
     three_month_expenses = 3*(st.session_state.expenses_df["amount"].sum())
@@ -141,17 +145,11 @@ if "data_loaded" not in st.session_state:
     st.session_state.data_loaded = True
 
 st.title("Help Page:")
-consent = st.selectbox(
-    "Allow the AI assistant to access your financial data for more personalized help?",
-    options=["no", "yes"]
-)
-st.caption(
-    "If you choose 'yes', the assistant will use your inputs (income, expenses, assets, etc.) to give better recommendations. "
-    "Your data is only used within this app and is not shared externally. "
-    "You can still use the assistant without sharing your data."
-)
-st.session_state.consent = consent
-st.write("Please give a second for responses to load.")
+if st.session_state.ai_permission == "no":
+    st.caption(
+        "You are currently not sharing your information with the ai assistant. To change this for more personalized responses, go to the Settings page."
+    )
+st.caption("Please give a second for responses to load.")
 
 def build_user_context_data_consent():
     return f"""
@@ -206,7 +204,7 @@ if prompt := st.chat_input("How can I help?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-    if st.session_state.consent == "yes":
+    if st.session_state.ai_permission == "yes":
         user_context = build_user_context_data_consent()
     else:
         user_context = build_user_context_no_consent()

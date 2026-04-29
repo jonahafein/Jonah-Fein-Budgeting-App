@@ -12,7 +12,7 @@ if "email" not in st.session_state:
     st.session_state.user_id = None
     st.session_state.birthdate = None
     
-email_input = st.text_input("Enter your email")
+email_input = st.text_input("Enter your email").lower()
 birthdate = st.date_input("Enter your birthdate", min_value=datetime.date(1900, 1, 1))
 
 if st.button("Start"):

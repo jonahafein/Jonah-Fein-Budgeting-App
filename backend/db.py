@@ -107,12 +107,20 @@ class Database:
     
     def get_goals(self, user_id):
         res = self.supabase.table("goals") \
-            .select("goal") \
+            .select("goal_name, target_amount, timeline_years, priority") \
             .eq("user_id", user_id) \
             .execute()
         
         if res.data:
-            return [row["goal"] for row in res.data]
+            return [
+                {
+                    "goal_name": row["goal_name"] if row["goal_name"] is not None else None,
+                    "target_amount": float(row["target_amount"]) if row["target_amount"] is not None else 0,
+                    "timeline_years": int(row["timeline_years"]) if row["timeline_years"] is not None else 0,
+                    "priority": row["priority"] if row["priority"] is not None else None,
+                }
+                for row in res.data
+            ]
         
         return []
     
@@ -172,13 +180,14 @@ class Database:
         
     def get_dashboard(self, user_id):
         res = self.supabase.table("dashboard") \
-            .select("trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view") \
+            .select("margin_on_debt_monthly, trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view") \
             .eq("user_id", user_id) \
             .execute()
         
         if res.data:
             row = res.data[0]
             return {
+                "margin_on_debt_monthly": row["margin_on_debt_monthly"] if row["margin_on_debt_monthly"] is not None else 0,
                 "trad_401k_contributions": row["trad_401k_contributions"] if row["trad_401k_contributions"] is not None else 0,
                 "trad_401k_match_annual": row["trad_401k_match_annual"] if row["trad_401k_match_annual"] is not None else 0,
                 "roth_ira_monthly": row["roth_ira_monthly"] if row["roth_ira_monthly"] is not None else 0,
@@ -232,7 +241,7 @@ class Database:
             .eq("user_id", user_id) \
             .execute()
     
-    def update_goals(self, user_id, goals: list):
+    def update_goals(self, user_id, goals_df):
         # delete existing
         self.supabase.table("goals") \
             .delete() \
@@ -240,7 +249,16 @@ class Database:
             .execute()
 
         # insert new
-        data = [{"user_id": user_id, "goal": goal} for goal in goals]
+        data = [
+            {
+                "user_id": user_id,
+                "goal_name": row["goal_name"],
+                "target_amount": row["target_amount"],
+                "timeline_years": row["timeline_years"],
+                "priority": row["timeline_years"]
+            }
+            for _, row in goals_df.iterrows()
+        ]
 
         if data:
             self.supabase.table("goals").insert(data).execute()
@@ -314,7 +332,7 @@ class Database:
             .execute()
         
     def update_dashboard(
-        self, user_id,
+        self, user_id, margin_on_debt_monthly,
         trad_401k_contributions,
         trad_401k_match_annual,
         roth_ira_monthly,
@@ -327,6 +345,7 @@ class Database:
     ):
         self.supabase.table("dashboard").upsert({
             "user_id": user_id,
+            "margin_on_debt_monthly": margin_on_debt_monthly,
             "trad_401k_contributions": trad_401k_contributions,
             "trad_401k_match_annual": trad_401k_match_annual,
             "roth_ira_monthly": roth_ira_monthly,

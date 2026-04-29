@@ -25,7 +25,7 @@ if "loaded" not in st.session_state:
     # first pull the data
     assets = db.get_non_home_assets(user_id)
     home_data = db.get_home(user_id)
-    goals = db.get_goals(user_id)
+    goals_df = db.get_goals(user_id)
     debt_df = db.get_debts(user_id)
     
     # next set the session state 
@@ -35,7 +35,13 @@ if "loaded" not in st.session_state:
     st.session_state.brokerage_returns = assets["brokerage_returns"] if assets else 0
     st.session_state.retirement = assets["retirement"] if assets else 0
     st.session_state.retirement_returns = assets["retirement_returns"] if assets else 0
-    st.session_state.goals = goals if goals else []
+    if goals_df:
+        st.session_state.goals_df = pd.DataFrame([{
+            "goal_name": goal["goal_name"],
+            "target_amount": goal["target_amount"],
+            "timeline_years": goal["timeline_years"],
+            "priority": goal["priority"]
+        }for goal in goals_df])
     st.session_state.home_data = home_data if home_data else None
     if home_data:
         st.session_state.years = home_data["years"]
@@ -60,6 +66,9 @@ st.write("Make sure to save any changes made.")
 # initialize debt_df if not there
 if "debt_df" not in st.session_state:
     st.session_state.debt_df = pd.DataFrame(columns = ["Item", "Balance", "Interest Rate"])
+    
+if "goals_df" not in st.session_state:
+    st.session_state.goals_df = pd.DataFrame(columns = ["goal_name", "target_amount", "timeline_years", "priority", "delete"])
 
 # (probably a redundant check but harmless)
 if st.session_state.email: 
@@ -141,10 +150,31 @@ if st.session_state.email:
         fees = None
     # add other necessary questions
 
-    goals = st.multiselect('Goals:', ['Build up my emergency fund', 'invest/save for non retirement', 'invest for retirement', 'other'], default = st.session_state.goals)
-    st.session_state.goals = goals
-    if 'other' in goals:
-        monthly_other = st.number_input("Estimate how many dollars a month you will need to put away for your other category:", key = "monthly_other")
+    st.write("Please enter any specific savings goals you might have (e.g., down payment for a house, cash for a car, etc.)")
+    if 'goals_df' not in st.session_state:
+        st.session_state.goals_df = pd.DataFrame(columns = ["goal_name", "target_amount", "timeline_years", "priority", "delete"])
+    
+    col1,col2, col3, col4 = st.columns(4)
+    with col1:
+        goal_name = st.text_input("Enter your goal's name:", key = "goal_name")
+    with col2:
+        target_amount = st.number_input("Enter your target amount for this goal", key = "target_amount")
+    with col3:
+        timeline_years = st.number_input("Enter how many years from now you aim to achieve this goal (realistically)", key = "timeline_years")
+    with col4:
+        priority = st.selectbox("How much of a priority is this goal?", options = ["high", "medium", "low"])
+        
+    if st.button("Add Goal"):
+        if goal_name:
+            st.session_state.goals_df.loc[len(st.session_state.goals_df)] = [goal_name, target_amount, timeline_years, priority, False]
+        else:
+            st.warning("Please enter a goal")
+            
+    st.write("### Savings Goals:", st.session_state.goals_df)
+    st.session_state.goals_df["delete"] = False
+    st.write("Edit or delete savings goals here:")
+    st.session_state.goals_df = st.data_editor(st.session_state.goals_df, num_rows = "dynamic", use_container_width=True)
+    st.session_state.goals_df = st.session_state.goals_df[st.session_state.goals_df["delete"] == False]
     
     
     st.write("Add debt items here:")
@@ -197,7 +227,11 @@ if st.session_state.email:
         else:
             db.delete_home(user_id)
         goals = list(st.session_state.goals)
-        db.update_goals(user_id, goals)
+        goals_df = st.session_state.goals_df.copy()
+        goals_df = goals_df.replace("", None)
+        goals_df["target_amount"] = pd.to_numeric(goals_df["target_amount"], errors="coerce")
+        goals_df = goals_df.dropna(subset=["goal_name", "target_amount"])
+        db.update_goals(user_id, goals_df)
         df = st.session_state.debt_df.copy()
         df = df.replace("", None)
         df["Balance"] = pd.to_numeric(df["Balance"], errors="coerce")
