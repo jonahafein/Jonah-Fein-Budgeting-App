@@ -135,7 +135,7 @@ We recommend setting your federal withholding based on your salary only.
 This keeps your monthly withholding accurate and avoids relying on bonus timing.
 """)
 if months_worked < 12:
-    payroll_annual_federal_taxable_estimate = utils.get_annual_federal_taxable_income(annual_income = annual_income, trad_401k_contributions_monthly = trad_401k_contributions_monthly, standard_deduction = standard_deduction)
+    payroll_annual_federal_taxable_estimate = utils.get_annual_federal_taxable_income(annual_income = annual_income, trad_401k_contributions_monthly = trad_401k_contributions_monthly, standard_deduction = standard_deduction, months_worked = months_worked)
     payroll_federal_tax_estimate = utils.calculate_federal_tax(single = single, annual_federal_taxable_income = payroll_annual_federal_taxable_estimate)
     monthly_payroll_federal_tax_estimate = payroll_federal_tax_estimate/12
     st.write(f"Based on your current paycheck, payroll may withhold approximately, payroll may withhold approximately ${months_worked*monthly_payroll_federal_tax_estimate:,.2f}.")
