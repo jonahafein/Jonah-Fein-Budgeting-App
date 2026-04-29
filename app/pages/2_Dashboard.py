@@ -239,7 +239,7 @@ Assets:
 Debt:
 - Total debt: {st.session_state.debt_df}
 
-Investing:
+Here is their current investing plan (feel free to suggest changes):
 - Traditional 401k monthly: {st.session_state.get("trad_401k_contributions_monthly", 0)}
 - Roth IRA monthly: {st.session_state.get("roth_ira_monthly", 0)}
 - Roth 401k monthly: {st.session_state.get("roth_401k_contributions_monthly", 0)}
