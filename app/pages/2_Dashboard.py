@@ -13,9 +13,27 @@ from backend.recs_llm import ai_recs
 import re
 
 def clean_text(text):
+    import re
     text = re.sub(r'(\d)([A-Za-z])', r'\1 \2', text)
+    text = re.sub(r'([A-Za-z])(\d)', r'\1 \2', text)
+    # Fix camelCase
     text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
-    return text
+    # REMOVE markdown formatting
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
+    text = re.sub(r'\*(.*?)\*', r'\1', text)
+    text = re.sub(r'_(.*?)_', r'\1', text)
+
+    # add spaces in long merged words
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)  # again just in case
+    text = re.sub(r'([a-z]{2,})([A-Z])', r'\1 \2', text)
+
+    # Add space before parentheses if missing
+    text = re.sub(r'([a-zA-Z])\(', r'\1 (', text)
+
+    # Fix multiple spaces
+    text = re.sub(r'\s+', ' ', text)
+
+    return text.strip()
 
 if not st.session_state.get("email"):
     st.warning("Please log in first")
