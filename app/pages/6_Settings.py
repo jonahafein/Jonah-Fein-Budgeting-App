@@ -38,13 +38,13 @@ st.write("The goal of this page is to help you set your preferences for us to be
 st.subheader("Debt Agression")
 if st.session_state.email:
     email = st.session_state.email
-    debt_aggression = st.selectbox("How aggressive are you willing to be with paying off your debt? (ignore if you don't have any debt)", options = ["extremely", "moderately", "minimally"], value = st.session_state.debt_aggression)
+    debt_aggression = st.selectbox("How aggressive are you willing to be with paying off your debt? (ignore if you don't have any debt)", options = ("extremely", "moderately", "minimally"), value = st.session_state.debt_aggression)
     st.session_state.debt_aggression = debt_aggression
-    emergency_importance = st.selectbox("How important is saving at least 3 months of expenses to you? (ignore if you've already saved 3+ months of expenses)", options = ["extremely", "moderately", "minimally"], value = st.session_state.emergency_importance)
+    emergency_importance = st.selectbox("How important is saving at least 3 months of expenses to you? (ignore if you've already saved 3+ months of expenses)", options = ("extremely", "moderately", "minimally"), value = st.session_state.emergency_importance)
     st.session_state.emergency_importance = emergency_importance
-    investing_aggression = st.selectbox("How aggressively do you want to invest?", options = ["conservative", "balanced", "aggressive"], value = st.session_state.investing_aggression)
+    investing_aggression = st.selectbox("How aggressively do you want to invest?", options = ("conservative", "balanced", "aggressive"), value = st.session_state.investing_aggression)
     st.session_state.investing_aggression = investing_aggression
-    bonus_strategy = st.selectbox("How do you want to use your bonus?", options = ["save", "invest", "split"], value = st.session_state.bonus_strategy)
+    bonus_strategy = st.selectbox("How do you want to use your bonus?", options = ("save", "invest", "split"), value = st.session_state.bonus_strategy)
     st.session_state.bonus_strategy = bonus_strategy
     if st.button("Save Settings"):
         db = Database()
