@@ -89,6 +89,11 @@ if st.session_state.email:
             st.warning("Please enter an expense")
             
     st.write("### Monthly Expenses:", st.session_state.expenses_df)
+    # not in debt
+    if "debt_df" in st.session_state and st.session_state.debt_df.empty:
+        st.caption("Include both needs and wants.")
+    else:
+        st.caption("Include both needs and wants. Also, include minimum payment on each debt item(s) you have.")
     st.session_state.expenses_df["Delete"] = False
     st.write("Edit or delete expenses here:")
     st.session_state.expenses_df = st.data_editor(st.session_state.expenses_df, num_rows = "dynamic", use_container_width=True)
