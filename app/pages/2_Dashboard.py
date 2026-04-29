@@ -158,6 +158,7 @@ net_worth = utils.calculate_net_worth(home_value = st.session_state.home_value, 
 trad_401k_contributions_monthly = 0
 monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions_monthly = trad_401k_contributions_monthly, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
 monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions_monthly = trad_401k_contributions_monthly, months_worked = months_worked)
+st.session_state.monthly_margin = monthly_margin
 st.write(f"Net Worth: ${net_worth:,.2f}")
 st.write(f"Monthly Income After Tax (before any traditional 401k investing): ${monthly_margin + st.session_state.expenses_df["amount"].sum():,.2f}")
 st.write(f"Monthly Expenses: ${st.session_state.expenses_df["amount"].sum():,.2f}")
@@ -204,7 +205,7 @@ Income:
 - Annual income: {st.session_state.get("annual_income", 0)}
 - Bonus: {st.session_state.get("annual_bonus", 0)}
 - Months worked this calendar year: {st.session_state.get("months_worked", 12)}
-- Monthly margin (take home - expenses): {baseline_monthly_margin}
+- Monthly margin (take home - expenses): {st.session_state.get("monthly_margin")}
 
 Expenses:
 - Total monthly expenses: {st.session_state.expenses_df["amount"].sum()}
