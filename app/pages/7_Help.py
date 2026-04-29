@@ -52,8 +52,8 @@ if "data_loaded" not in st.session_state:
 
     # add all else to session_state
     dashboard = db.get_dashboard(user_id)
-    trad_401k_contributions = dashboard["trad_401k_contributions"] if dashboard else 0
-    trad_401k_match_annual = dashboard["trad_401k_match_annual"] if dashboard else 0
+    trad_401k_contributions_monthly = dashboard["trad_401k_contributions_monthly"] if dashboard else 0
+    trad_401k_match_monthly = dashboard["trad_401k_match_monthly"] if dashboard else 0
     roth_ira_monthly = dashboard["roth_ira_monthly"] if dashboard else 0
     roth_401k_contributions_monthly = dashboard["roth_401k_contributions_monthly"] if dashboard else 0
     roth_401k_match_monthly = dashboard["roth_401k_match_monthly"] if dashboard else 0
@@ -62,8 +62,8 @@ if "data_loaded" not in st.session_state:
     years_from_brokerage = dashboard["years_from_brokerage"] if dashboard else 0
     future_savings_view = dashboard["future_savings_view"] if dashboard else 0
 
-    st.session_state.trad_401k_contributions = trad_401k_contributions if trad_401k_contributions else 0
-    st.session_state.trad_401k_match_annual = trad_401k_match_annual if trad_401k_match_annual else 0
+    st.session_state.trad_401k_contributions_monthly = trad_401k_contributions_monthly if trad_401k_contributions_monthly else 0
+    st.session_state.trad_401k_match_monthly = trad_401k_match_monthly if trad_401k_match_monthly else 0
     st.session_state.roth_ira_monthly = roth_ira_monthly if roth_ira_monthly else 0
     st.session_state.roth_401k_contributions_monthly = roth_401k_contributions_monthly if roth_401k_contributions_monthly else 0
     st.session_state.roth_401k_match_monthly = roth_401k_match_monthly if roth_401k_match_monthly else 0
@@ -167,7 +167,7 @@ Debt:
 - Total debt: {st.session_state.debt_df}
 
 Investing:
-- Traditional 401k: {st.session_state.get("trad_401k_contributions", 0)}
+- Traditional 401k monthly: {st.session_state.get("trad_401k_contributions_monthly", 0)}
 - Roth IRA monthly: {st.session_state.get("roth_ira_monthly", 0)}
 - Roth 401k monthly: {st.session_state.get("roth_401k_contributions_monthly", 0)}
 
