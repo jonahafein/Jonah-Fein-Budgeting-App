@@ -44,15 +44,5 @@ After updating, return to the dashboard to see:
 - An updated financial snapshot  
 - Revised recommendations  
 - New projections  
-
----
-
-## Additional Notes
-
-**I set the app up so that you are unable to use the financial projections section until you are
-debt free and have at least 3 months of emergency savings. My logic is to force you to complete those 
-first before making plans for your future financial allocation.**
-
-If you want to bypass this, I recommend making a second account that will be based on your financial outlook once you are debt free
-and have 3+ months of emergency funds saved. 
+ 
 """)
