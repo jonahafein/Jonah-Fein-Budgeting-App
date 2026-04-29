@@ -261,7 +261,7 @@ if bonus_taxes > 0:
     st.write(f"Estimated total tax on bonus (federal, state, FICA): ${bonus_taxes:,.2f}")
 st.write("See the tax optimization page for more tax details/recommendations.")
 
-st.subheader("Financial Projections:")
+st.subheader("Financial Planning:")
 # single, no house yet
 if st.session_state.marriage_status == "single" and st.session_state.home_balance == 0 and st.session_state.home_value == 0:
     st.markdown("""
