@@ -140,7 +140,7 @@ if "data_loaded" not in st.session_state:
         continue_on_step4 = True
     st.session_state.data_loaded = True
 
-st.title("Help Page:")
+st.title("Help Page")
 st.caption("Please give a second for responses to load.")
 
 def build_user_context_data():
