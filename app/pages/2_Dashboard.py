@@ -253,6 +253,9 @@ debt agression (or willingness to pay extra on debt): {st.session_state.get("deb
 Importance of having 3-6 months of expenses saved: {st.session_state.get("emergency_importance", "extremely")}
 Investing aggression: {st.session_state.get("investing_aggression", "balanced")}
 Do they want to save, invest, or split bonus: {st.session_state.get("bonus_strategy", "save")}
+
+Please remember:
+Do NOT use *, -, or any bullet symbols (e.g., if you want to say "5-6 months" say "5 to 6 months" or "5 or 6 months"). Please respect this. No symbols use words in their place instead, be creative if needed. 
 """
 
 client = ai_recs()

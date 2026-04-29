@@ -70,7 +70,7 @@ TONE:
 ---
 
 FORMAT RULES (STRICT):
-
+VERY IMPORTANT:
 - Do NOT use *, -, or any bullet symbols (e.g., if you want to say "5-6 months" say "5 to 6 months" or "5 or 6 months"). Please respect this. No symbols use words instead, be creative if needed. 
 - Do NOT use bold or italics
 - Each recommendation must be on its own line
