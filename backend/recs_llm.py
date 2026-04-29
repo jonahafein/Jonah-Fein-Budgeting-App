@@ -73,7 +73,7 @@ TONE:
 
 FORMAT RULES (STRICT):
 
-- Do NOT use *, -, or any bullet symbols
+- Do NOT use *, -, or any bullet symbols (e.g., if you want to say "This should take 5-6 months." say "This should take 5 to 6 months." instead)
 - Do NOT use bold or italics
 - Each recommendation must be on its own line
 - Use a newline between each recommendation

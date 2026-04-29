@@ -18,13 +18,7 @@ def clean_text(text):
     text = re.sub(r'\*([^*]+)\*', r'\1', text) # italics
     
     # remove stray bullet symbols
-    text = text.replace("*", "")
-
-    # replace hyphens BETWEEN NUMBERS with " to "
-    text = re.sub(r'(\d)\s*-\s*(\d)', r'\1 to \2', text)
-
-    # remove other stray hyphens 
-    text = re.sub(r'-', ' ', text)
+    text = text.replace("*", "").replace("-", "")
 
     # add spaces when missing
     text = re.sub(r'(\d)([A-Za-z])', r'\1 \2', text)
@@ -284,7 +278,7 @@ if len(lines) <= 1:
 for line in lines:
     line = line.strip()
     if line:
-        st.markdown(f"- {line}")
+        st.markdown(f"{line}")
 
 st.write(f"We recommend you withhold approximately ${recommended_withholding:,.2f} per month for federal income tax (excludes state/local & FICA).")
 if bonus_taxes > 0:
