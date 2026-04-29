@@ -18,7 +18,13 @@ def clean_text(text):
     text = re.sub(r'\*([^*]+)\*', r'\1', text) # italics
     
     # remove stray bullet symbols
-    text = text.replace("*", "").replace("-", "")
+    text = text.replace("*", "")
+
+    # replace hyphens BETWEEN NUMBERS with " to "
+    text = re.sub(r'(\d)\s*-\s*(\d)', r'\1 to \2', text)
+
+    # remove other stray hyphens 
+    text = re.sub(r'-', ' ', text)
 
     # add spaces when missing
     text = re.sub(r'(\d)([A-Za-z])', r'\1 \2', text)

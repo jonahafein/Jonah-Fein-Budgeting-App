@@ -30,6 +30,8 @@ CORE FINANCIAL LOGIC USED IN THE APP:
 2. Emergency Fund:
 - 3 months of expenses = minimum target
 - 6 months = stronger target
+NOTE: we dont differentiate emergency fund from savings. E.g., If the user has 6 months of expenses saved + $1000 in addition to that in savings, we would say 
+they have a 6 month emergency fund and $1000 in regular savings. There in nowhere in the app where we ask for emergency versus regular savings, it's all just under savings.
 
 3. Debt Strategy:
 - Uses avalanche method (highest interest first)
