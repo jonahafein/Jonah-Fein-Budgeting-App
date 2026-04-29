@@ -35,7 +35,6 @@ st.session_state.bonus_strategy = bonus_strategy if bonus_strategy else "save"
 st.title("Settings:")
 st.write("The goal of this page is to help you set your preferences for us to best customize your experience.")
 
-st.subheader("Debt Agression")
 if st.session_state.email:
     email = st.session_state.email
     debt_and_emergency = ("extremely", "moderately", "minimally")
