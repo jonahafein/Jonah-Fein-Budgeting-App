@@ -25,7 +25,6 @@ if "loaded" not in st.session_state:
     # first pull the data
     assets = db.get_non_home_assets(user_id)
     home_data = db.get_home(user_id)
-    goals = db.get_goals(user_id)
     debt_df = db.get_debts(user_id)
     
     # next set the session state 
@@ -35,7 +34,6 @@ if "loaded" not in st.session_state:
     st.session_state.brokerage_returns = assets["brokerage_returns"] if assets else 0
     st.session_state.retirement = assets["retirement"] if assets else 0
     st.session_state.retirement_returns = assets["retirement_returns"] if assets else 0
-    st.session_state.goals = goals if goals else []
     st.session_state.home_data = home_data if home_data else None
     if home_data:
         st.session_state.years = home_data["years"]
@@ -54,7 +52,7 @@ if "loaded" not in st.session_state:
     st.session_state.loaded = True
     
 
-st.title("Assets and Goals")
+st.title("Assets")
 st.write("Make sure to save any changes made.")
 
 # initialize debt_df if not there
@@ -140,11 +138,6 @@ if st.session_state.email:
         home_interest = None
         fees = None
     # add other necessary questions
-
-    goals = st.multiselect('Goals:', ['Build up my emergency fund', 'invest/save for non retirement', 'invest for retirement', 'other'], default = st.session_state.goals)
-    st.session_state.goals = goals
-    if 'other' in goals:
-        monthly_other = st.number_input("Estimate how many dollars a month you will need to put away for your other category:", key = "monthly_other")
     
     
     st.write("Add debt items here:")
@@ -171,7 +164,7 @@ if st.session_state.email:
     st.session_state.debt_df = st.data_editor(st.session_state.debt_df, num_rows = "dynamic", use_container_width=True)
     st.session_state.debt_df = st.session_state.debt_df[st.session_state.debt_df["Delete"] == False]
        
-    if st.button("Save Assets and Goals"):
+    if st.button("Save Assets"):
         st.session_state.profile = {
             "email": email,
             "savings": savings,
@@ -180,8 +173,6 @@ if st.session_state.email:
             "brokerage_returns": brokerage_returns if brokerage > 0 else None,
             "retirement": retirement,
             "retirement_returns": retirement_returns if retirement > 0 else None,
-            "goals": goals,
-            "monthly_other": monthly_other if "other" in goals else None,
             "debt_df": st.session_state.debt_df if not st.session_state.debt_df.empty else None,
             "home": home,
             "paid": paid,
@@ -196,15 +187,13 @@ if st.session_state.email:
             db.update_home(user_id, paid_bool, st.session_state.home_value, st.session_state.years, st.session_state.home_balance, st.session_state.home_interest, st.session_state.fees)
         else:
             db.delete_home(user_id)
-        goals = list(st.session_state.goals)
-        db.update_goals(user_id, goals)
         df = st.session_state.debt_df.copy()
         df = df.replace("", None)
         df["Balance"] = pd.to_numeric(df["Balance"], errors="coerce")
         df["Interest Rate"] = pd.to_numeric(df["Interest Rate"], errors="coerce")
         df = df.dropna(subset=["Item", "Balance", "Interest Rate"])
         db.update_debts(user_id, df)
-        st.success("Assets and Goals Saved!")
+        st.success("Assets Saved!")
         st.session_state.home_data = db.get_home(user_id)
     
         
