@@ -315,7 +315,9 @@ class Database:
             .execute()
         
     def update_dashboard(
-        self, user_id, margin_on_debt_monthly,
+        self, 
+        user_id, 
+        margin_on_debt_monthly,
         trad_401k_contributions,
         trad_401k_match_annual,
         roth_ira_monthly,
