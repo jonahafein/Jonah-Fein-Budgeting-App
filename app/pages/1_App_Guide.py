@@ -17,9 +17,9 @@ If at any point you are stuck or need anything clarified, the help page has an a
 
 At the beginning of each month (or as a first-time user), start by updating the **Assets and Goals** page. Values do not update automatically, so be sure to manually input any changes and click **Save** at the bottom.
 
-Next, update your **Income and Expenses** if:
+Next, update **Settings and/or Income and Expenses** if:
 - You are a first-time user, or  
-- Your financial situation has changed  
+- Your preferences and/or financial situation has changed  
 
 Again, be sure to click **Save** after making any updates.
 
@@ -30,7 +30,7 @@ Again, be sure to click **Save** after making any updates.
 The **Dashboard** provides:
 - A snapshot of your financial position  
 - Personalized recommendations  
-- Interactive tools to explore saving and investing strategies  
+- Financial planning with tools to explore saving and investing strategies
 
 Adjust the sliders to test different allocation strategies and decide how to best use your monthly margin. Once finished, click **Save** at the bottom to preserve your selections and projections.
 
@@ -38,7 +38,7 @@ Adjust the sliders to test different allocation strategies and decide how to bes
 
 ## Keeping Everything Updated
 
-If you apply any recommendations from the dashboard that change your financial inputs (income, expenses, assets, etc.), make sure to update those changes on the appropriate pages and save them.
+If you apply any recommendations from the dashboard that change your financial inputs (income, expenses, assets, settings, etc.), make sure to update those changes on the appropriate pages and save them.
 
 After updating, return to the dashboard to see:
 - An updated financial snapshot  

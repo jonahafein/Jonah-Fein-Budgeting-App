@@ -71,7 +71,21 @@ if "data_loaded" not in st.session_state:
     st.session_state.brokerage_contributions_monthly = brokerage_contributions_monthly if brokerage_contributions_monthly else 0
     st.session_state.years_from_brokerage = years_from_brokerage if years_from_brokerage else 0
     st.session_state.future_savings_view = future_savings_view if future_savings_view else 0
-        
+
+
+    # settings: 
+    settings = db.get_settings(user_id)
+    debt_aggression = settings["debt_aggression"] if settings else "extremely"
+    emergency_importance = settings["emergency_importance"] if settings else "extremely"
+    investing_aggression = settings["investing_aggression"] if settings else "balanced"
+    bonus_strategy = settings["bonus_strategy"] if settings else "save"
+
+    st.session_state.debt_aggression = debt_aggression if debt_aggression else "extremely"
+    st.session_state.emergency_importance = emergency_importance if emergency_importance else "extremely"
+    st.session_state.investing_aggression = investing_aggression if investing_aggression else "balanced"
+    st.session_state.bonus_strategy = bonus_strategy if bonus_strategy else "save"
+
+
     # now let's load assets and goals:
     assets = db.get_non_home_assets(user_id)
     home_data = db.get_home(user_id)
@@ -150,7 +164,7 @@ Here is the user's financial data:
 Income:
 - Annual income: {st.session_state.get("annual_income", 0)}
 - Bonus: {st.session_state.get("annual_bonus", 0)}
-- Months worked: {st.session_state.get("months_worked", 12)}
+- Months worked this calendar year: {st.session_state.get("months_worked", 12)}
 
 Expenses:
 - Total monthly expenses: {st.session_state.expenses_df["amount"].sum()}
@@ -173,6 +187,12 @@ Investing:
 
 Goals:
 - {st.session_state.get("goals", [])}
+
+User Preferences:
+debt agression (or willingness to pay extra on debt): {st.session_state.get("debt_aggression", "extremely")}
+Importance of having 3-6 months of expenses saved: {st.session_state.get("emergency_importance", "extremely")}
+Investing aggression: {st.session_state.get("investing_aggression", "balanced")}
+Do they want to save, invest, or split bonus: {st.session_state.get("bonus_strategy", "save")}
 """
 
 def stream_response(stream):
