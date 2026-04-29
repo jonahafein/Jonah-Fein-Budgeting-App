@@ -77,7 +77,7 @@ FORMAT RULES (VERY IMPORTANT):
 - Always write in clean, readable sentences
 - Use standard bullet points with normal spacing
 - Do NOT use *, -, or markdown bullets
-- Return each recommendation on a NEW LINE
+- Return each recommendation on a NEW LINE with a blank line in between each recommendation
 - Each line should be a complete sentence
 
 --- 
