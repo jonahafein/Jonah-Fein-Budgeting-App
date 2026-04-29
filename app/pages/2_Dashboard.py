@@ -10,6 +10,13 @@ from backend.db import Database
 import backend.utils as utils
 from backend.recs_llm import ai_recs
 
+import re
+
+def clean_text(text):
+    text = re.sub(r'(\d)([A-Za-z])', r'\1 \2', text)
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+    return text
+
 if not st.session_state.get("email"):
     st.warning("Please log in first")
     st.stop()
@@ -247,9 +254,9 @@ response = client.chat(
     stream=False
 )
 
-recommendations = response.choices[0].message.content
+recommendations = clean_text(response.choices[0].message.content)
 
-st.markdown(recommendations)
+st.write(recommendations)
 
 st.write(f"We recommend you withhold approximately ${recommended_withholding:,.2f} per month for federal income tax (excludes state/local & FICA).")
 if bonus_taxes > 0:
