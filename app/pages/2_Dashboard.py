@@ -169,7 +169,7 @@ st.write(f"6 month emergency fund: ${six_month_expenses:,.2f}", six_month_expens
 if st.session_state.debt_df is not None and not st.session_state.debt_df.empty and st.session_state.debt_df["Balance"].sum() > 0:
     st.write(f"Your debt: ${st.session_state.debt_df["Balance"].sum()} with average interest: {np.average(st.session_state.debt_df['Interest Rate'], weights=st.session_state.debt_df['Balance']):,.2f}") 
 else:
-    st.write("You are not in debt!")
+    st.write("You Have no Debt!")
 if st.session_state.savings > six_month_expenses:
     st.write(f"You have ${st.session_state.savings - six_month_expenses:,.2f} in savings that exceed your 6 month emergency fund (i.e., regular savings).")
 age = datetime.today().date() - st.session_state.birthdate
@@ -248,71 +248,6 @@ response = client.chat(
 recommendations = response.choices[0].message.content
 
 st.markdown(recommendations)
-
-# baby step 1
-if st.session_state.savings < 1000:
-    st.write("We recommend that for now, you pause investing (including for retirement), and put all of your monthly margin towards building a $1000 starter emergency fund.")
-    monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions_monthly = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
-    monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions_monthly = trad_401k_contributions_monthly, months_worked = months_worked)
-    st.write(f"Your monthly margin this month should be roughly {monthly_margin:,.2f} dollars (assuming no investing). It should take you about {max((1000-st.session_state.savings)/max(monthly_margin,1),1)} months to achieve this.")
-# baby step 2 
-# TODO: change to first recommend using savings to get out of debt, and if that isnt enough then we use margin
-elif "debt_df" in st.session_state and not st.session_state.debt_df.empty and st.session_state.savings >= 1000:
-    highest_interest_debt = st.session_state.debt_df.loc[st.session_state.debt_df['Interest Rate'].idxmax()]['Item'] 
-    monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions_monthly = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
-    monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions_monthly = trad_401k_contributions_monthly, months_worked = months_worked)
-    if st.session_state.savings > 1000:
-        if st.session_state.savings - 1000 > st.session_state.debt_df["Balance"].sum():
-            money_for_debt = st.session_state.debt_df["Balance"].sum()
-        else:
-            money_for_debt = st.session_state.savings - 1000
-        st.write(f"We recommend you take ${money_for_debt:,.2f} from your savings and put in on your debt starting with {highest_interest_debt}.")
-        difference = st.session_state.savings - 1000
-        if difference < st.session_state.debt_df["Balance"].sum():
-            st.write(f"Next, we recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at your non-mortgage debt, starting with {highest_interest_debt} as it is your highest interest debt.")
-            st.write(f"Your monthly margin this month should be roughly ${monthly_margin:,.2f} dollars (assuming no investing). It should take you about {max((max(st.session_state.debt_df["Balance"].sum() - difference),0)/max(monthly_margin,1), 1):,.0f} months to be out of debt.")
-        elif difference >= st.session_state.debt_df["Balance"].sum() and difference < three_month_expenses:
-            st.write("You should be out of debt after that step!")
-            st.write("Next, we recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
-            savings_remainder = st.session_state.savings - st.session_state.debt_df["Balance"].sum()
-            st.write(f"You should now have roughly ${savings_remainder:,.2f} savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}. It should take you roughly {max((three_month_expenses - savings_remainder)/max(monthly_margin,1), 1):.0f} months to have 3 months of expenses saved.")
-        else:
-            st.write("You should now be out of debt and have over three months of expenses saved!")
-# baby step 3
-elif "debt_df" in st.session_state and st.session_state.debt_df.empty and st.session_state.savings < three_month_expenses:
-    monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions_monthly = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
-    monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions_monthly = trad_401k_contributions_monthly, months_worked = months_worked)
-    st.write("We recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
-    st.write(f"You current have ${st.session_state.savings:,.2f} in savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}, meaning you are {three_month_gap:,.2f} dollars away. It should take you about {max(three_month_gap/max(monthly_margin,1), 1):.0f} months to reach this goal.")
-# next build up to 6 months of emergency, maybe now with option to choose agressiveness towards saving vs investing
-elif continue_on_step4:
-    # TODO: logic for house, logic for moving on to step 7 (will need bool defined above and mutable here), slider for investing aggression, saving up to 6 mo, etc.
-    # have active mortgage
-    if st.session_state.home_balance > 0 and st.session_state.home_value > 0:
-        st.write("Congratulations! You aren't in debt. Based on your investing goals, we recommend you invest roughly 15% of your annual income into retirement, and put some of your extra margin on paying off your house early.")
-        fifteen_perc_annual = float(0.15*st.session_state.annual_income)
-        fifteen_perc_monthly = float(fifteen_perc_annual/12)
-        st.write(f"15% of your annual income is ${fifteen_perc_annual:,.2f} which is roughly ${fifteen_perc_monthly:,.2f} a month.")
-        if st.session_state.trad_401k_contributions_monthly + st.session_state.roth_ira_monthly + st.session_state.roth_401k_contributions_monthly < fifteen_perc_monthly:
-            difference = fifteen_perc_monthly - (st.session_state.trad_401k_contributions_monthly + st.session_state.roth_ira_monthly + st.session_state.roth_401k_contributions_monthly)
-            st.write(f"Warning ⛔️: You are investing ${difference:,.2f} a month less than 15% of your monthly income. We recommend you close the gap.")
-    # have no mortgage but no house yet
-    elif st.session_state.home_balance == 0 and st.session_state.home_value == 0:
-        st.write("Congratulations! You aren't in debt. We recommend you invest roughly 15% of your annual income into retirement, and put a large portion of your additional margin on saving for a down payment on a house. If you plan on buying a home within 3-4 years, we recommend you put all of this money in a high yield savings account, otherwise we recommend you invest some of this money and save some of it.")
-        fifteen_perc_annual = float(0.15*st.session_state.annual_income)
-        fifteen_perc_monthly = float(fifteen_perc_annual/12)
-        st.write(f"15% of your annual income is ${fifteen_perc_annual:,.2f} which is roughly ${fifteen_perc_monthly:,.2f} a month.")
-        if st.session_state.trad_401k_contributions_monthly + st.session_state.roth_ira_monthly + st.session_state.roth_401k_contributions_monthly < fifteen_perc_monthly:
-            difference = fifteen_perc_monthly - (st.session_state.trad_401k_contributions_monthly + st.session_state.roth_ira_monthly + st.session_state.roth_401k_contributions_monthly)
-            st.write(f"Warning ⛔️: You are investing ${difference:,.2f} a month less than 15% of your monthly income. We recommend you close the gap.")
-    elif  st.session_state.home_balance == 0 and st.session_state.home_value > 0:
-        st.write("Congratulations! You aren't in debt including your house! We recommend you invest at least 15% of your annual income into retirement. Otherwise, make sure to keep saving, enjoying, and being generous with the rest of your margin!")
-        fifteen_perc_annual = float(0.15*st.session_state.annual_income)
-        fifteen_perc_monthly = float(fifteen_perc_annual/12)
-        st.write(f"15% of your annual income is ${fifteen_perc_annual:,.2f} which is roughly ${fifteen_perc_monthly:,.2f} a month.")
-        if st.session_state.trad_401k_contributions_monthly + st.session_state.roth_ira_monthly + st.session_state.roth_401k_contributions_monthly < fifteen_perc_monthly:
-            difference = fifteen_perc_monthly - (st.session_state.trad_401k_contributions_monthly + st.session_state.roth_ira_monthly + st.session_state.roth_401k_contributions_monthly)
-            st.write(f"Warning ⛔️: You are investing ${difference:,.2f} a month less than 15% of your monthly income. We recommend you close the gap.")
 
 st.write(f"We recommend you withhold approximately ${recommended_withholding:,.2f} per month for federal income tax (excludes state/local & FICA).")
 if bonus_taxes > 0:
