@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".
 
 from backend.db import Database
 import backend.utils as utils
+from backend.recs_llm import ai_recs
 
 if not st.session_state.get("email"):
     st.warning("Please log in first")
@@ -193,6 +194,61 @@ if bonus_after_tax > 0:
 
 # for each of these, add an estimated time to completion for goals
 st.subheader("Recommendations:")
+
+
+def build_user_context_data():
+    return f"""
+Here is the user's financial data:
+
+Income:
+- Annual income: {st.session_state.get("annual_income", 0)}
+- Bonus: {st.session_state.get("annual_bonus", 0)}
+- Months worked this calendar year: {st.session_state.get("months_worked", 12)}
+
+Expenses:
+- Total monthly expenses: {st.session_state.expenses_df["amount"].sum()}
+
+Breakdown:
+{st.session_state.expenses_df.to_dict(orient="records")}
+
+Assets:
+- Savings: {st.session_state.get("savings", 0)}
+- Brokerage: {st.session_state.get("brokerage", 0)}
+- Retirement: {st.session_state.get("retirement", 0)}
+
+Debt:
+- Total debt: {st.session_state.debt_df}
+
+Investing:
+- Traditional 401k monthly: {st.session_state.get("trad_401k_contributions_monthly", 0)}
+- Roth IRA monthly: {st.session_state.get("roth_ira_monthly", 0)}
+- Roth 401k monthly: {st.session_state.get("roth_401k_contributions_monthly", 0)}
+
+Goals:
+- {st.session_state.get("goals", [])}
+
+User Preferences:
+debt agression (or willingness to pay extra on debt): {st.session_state.get("debt_aggression", "extremely")}
+Importance of having 3-6 months of expenses saved: {st.session_state.get("emergency_importance", "extremely")}
+Investing aggression: {st.session_state.get("investing_aggression", "balanced")}
+Do they want to save, invest, or split bonus: {st.session_state.get("bonus_strategy", "save")}
+"""
+
+client = ai_recs()
+
+user_context = build_user_context_data()
+
+response = client.chat(
+    messages=[
+        {"role": "system", "content": user_context}
+    ],
+    stream=False
+)
+
+recommendations = response.choices[0].message.content
+
+st.markdown(recommendations)
+
 # baby step 1
 if st.session_state.savings < 1000:
     st.write("We recommend that for now, you pause investing (including for retirement), and put all of your monthly margin towards building a $1000 starter emergency fund.")
