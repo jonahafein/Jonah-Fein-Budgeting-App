@@ -410,14 +410,14 @@ if margin_on_debt_monthly == 0:
     dashboard_dict1 = {
         "Traditional 401k": f"${trad_401k_contributions/12:,.2f}",
         "Traditional 401k Match": f"${trad_401k_match_annual/12:,.2f}",
-        "Roth IRA Contributions": f"${roth_ira_monthly:,.2f}",
+        "Roth IRA": f"${roth_ira_monthly:,.2f}",
     }
     dashboard_df1 = pd.DataFrame(dashboard_dict1, index=[0])
 
     dashboard_dict2 = {
-        "Roth 401k Contributions": f"${roth_401k_contributions_monthly:,.2f}",
+        "Roth 401k": f"${roth_401k_contributions_monthly:,.2f}",
         "Roth 401k Match": f"${roth_401k_match_monthly:,.2f}",
-        "Brokerage Contributions": f"${brokerage_contributions_monthly:,.2f}",
+        "Brokerage": f"${brokerage_contributions_monthly:,.2f}",
         "Savings": f"${real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly:,.2f}",
     }
     dashboard_df2 = pd.DataFrame(dashboard_dict2, index=[0])
@@ -426,14 +426,14 @@ else:
         "Debt Additional Contribution": f"${margin_on_debt_monthly:,.2f}",
         "Traditional 401k": f"${trad_401k_contributions/12:,.2f}",
         "Traditional 401k Match": f"${trad_401k_match_annual/12:,.2f}",
-        "Roth IRA Contributions": f"${roth_ira_monthly:,.2f}",
+        "Roth IRA": f"${roth_ira_monthly:,.2f}",
     }
     dashboard_df1 = pd.DataFrame(dashboard_dict1, index=[0])
 
     dashboard_dict2 = {
-        "Roth 401k Contributions": f"${roth_401k_contributions_monthly:,.2f}",
+        "Roth 401k": f"${roth_401k_contributions_monthly:,.2f}",
         "Roth 401k Match": f"${roth_401k_match_monthly:,.2f}",
-        "Brokerage Contributions": f"${brokerage_contributions_monthly:,.2f}",
+        "Brokerage": f"${brokerage_contributions_monthly:,.2f}",
         "Savings": f"${real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly:,.2f}",
     }
     dashboard_df2 = pd.DataFrame(dashboard_dict2, index=[0])
