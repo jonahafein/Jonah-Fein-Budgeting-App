@@ -139,7 +139,7 @@ if months_worked < 12:
     payroll_federal_tax_estimate = utils.calculate_federal_tax(single = single, annual_federal_taxable_income = payroll_annual_federal_taxable_estimate)
     monthly_payroll_federal_tax_estimate = payroll_federal_tax_estimate/12
     st.write(f"Based on your current paycheck, payroll may withhold approximately, payroll may withhold approximately ${months_worked*monthly_payroll_federal_tax_estimate:,.2f}.")
-    st.write(f"Since you are working less than 12 months this calendar year, you are overpaying federal income tax by about ${months_worked*monthly_payroll_federal_tax_estimate - salary_federal_tax:,.2f}. To correct for this, you could enter approximately {max(months_worked*monthly_payroll_federal_tax_estimate - salary_federal_tax - 100, 0):,.0f} in Step 3 of your W-4. This will reduce your total withholding for the year and bring you closer to your true tax liability (with a small buffer to be safe).")
+    st.write(f"Since you are working less than 12 months this calendar year, you are overpaying federal income tax by about ${months_worked*monthly_payroll_federal_tax_estimate - salary_federal_tax:,.2f}. To correct for this, you could enter approximately ${max(months_worked*monthly_payroll_federal_tax_estimate - salary_federal_tax - 100, 0):,.0f} in Step 3 of your W-4. This will reduce your total withholding for the year and bring you closer to your true tax liability (with a small buffer to be safe).")
 st.write("""
 A small refund (a few hundred dollars) is normal and can act as a buffer against underpayment penalties. 
 We do not recommend targeting a perfect $0 balance.
