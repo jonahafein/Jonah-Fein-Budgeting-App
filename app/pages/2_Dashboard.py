@@ -204,6 +204,7 @@ Income:
 - Annual income: {st.session_state.get("annual_income", 0)}
 - Bonus: {st.session_state.get("annual_bonus", 0)}
 - Months worked this calendar year: {st.session_state.get("months_worked", 12)}
+- Monthly margin (take home - expenses): {baseline_monthly_margin}
 
 Expenses:
 - Total monthly expenses: {st.session_state.expenses_df["amount"].sum()}
