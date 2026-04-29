@@ -1,8 +1,8 @@
 import pandas as pd
 from decimal import Decimal
 
-def get_annual_federal_taxable_income(annual_income, trad_401k_contributions, standard_deduction):
-    taxable = annual_income - trad_401k_contributions - standard_deduction
+def get_annual_federal_taxable_income(annual_income, trad_401k_contributions_monthly, standard_deduction, months_worked):
+    taxable = annual_income - trad_401k_contributions_monthly*months_worked - standard_deduction
     return max(0, taxable)
     
 
@@ -45,13 +45,13 @@ def calculate_federal_tax(single: bool, annual_federal_taxable_income):
     return round(tax, 2)
 
     
-def calculate_monthly_take_home(single: bool, annual_income,trad_401k_contributions, standard_deduction, state_tax_perc, local_tax_perc, months_worked = 12):
+def calculate_monthly_take_home(single: bool, annual_income,trad_401k_contributions_monthly, standard_deduction, state_tax_perc, local_tax_perc, months_worked = 12):
     # federal income taxes
     months_worked = max(months_worked, 1)
     actual_income = annual_income * (months_worked / 12)
     annual_taxable_income = actual_income
     
-    annual_federal_taxable_income = get_annual_federal_taxable_income(annual_taxable_income, trad_401k_contributions, standard_deduction)
+    annual_federal_taxable_income = get_annual_federal_taxable_income(annual_taxable_income, trad_401k_contributions_monthly, standard_deduction, months_worked)
     annual_federal_income_tax = calculate_federal_tax(single, annual_federal_taxable_income)
 
     # ss:
@@ -89,12 +89,12 @@ def calculate_monthly_take_home(single: bool, annual_income,trad_401k_contributi
     return (actual_income - annual_tax) / months_worked
       
 
-def calculate_monthly_margin(monthly_take_home, expenses_df, trad_401k_contributions, months_worked):
+def calculate_monthly_margin(monthly_take_home, expenses_df, trad_401k_contributions_monthly, months_worked):
     months_worked = max(months_worked, 1)
     if expenses_df is None or expenses_df.empty:
-        return monthly_take_home - trad_401k_contributions/months_worked
+        return monthly_take_home - trad_401k_contributions_monthly
     expense_total = expenses_df["amount"].sum()
-    return round(monthly_take_home - expense_total - trad_401k_contributions/months_worked,2)
+    return round(monthly_take_home - expense_total - trad_401k_contributions_monthly,2)
 
 def calculate_net_worth(home_value, home_debt, savings, brokerage, retirement, debt_total):
     home_equity = home_value - home_debt

@@ -13,7 +13,7 @@ if not st.session_state.get("email"):
     st.stop()
 
 st.title("Tax Optimization")
-st.write("The goal of this page is to help you pay as close to the right amount of taxes monthly as possible. Getting a big tax refund is actually a bad thing - it means you loaned money to the government at 0% interest! Note: input your annual traditional 401k contributions into dashboard before continuing (and then save) as that will have implications on your taxes.")
+st.write("The goal of this page is to help you pay as close to the right amount of taxes monthly as possible. Getting a big tax refund is actually a bad thing - it means you loaned money to the government at 0% interest! Note: input your monthly traditional 401k contributions into dashboard before continuing (and then save) as that will have implications on your taxes.")
 
 # getting their user_id  
 db = Database()
@@ -55,8 +55,8 @@ st.session_state.months_worked = months_worked
 
 # add all else to session_state
 dashboard = db.get_dashboard(user_id)
-trad_401k_contributions = dashboard["trad_401k_contributions"] if dashboard else 0
-trad_401k_match_annual = dashboard["trad_401k_match_annual"] if dashboard else 0
+trad_401k_contributions_monthly = dashboard["trad_401k_contributions_monthly"] if dashboard else 0
+trad_401k_match_monthly = dashboard["trad_401k_match_monthly"] if dashboard else 0
 roth_ira_monthly = dashboard["roth_ira_monthly"] if dashboard else 0
 roth_401k_contributions_monthly = dashboard["roth_401k_contributions_monthly"] if dashboard else 0
 roth_401k_match_monthly = dashboard["roth_401k_match_monthly"] if dashboard else 0
@@ -65,8 +65,8 @@ brokerage_contributions_monthly = dashboard["brokerage_contributions_monthly"] i
 years_from_brokerage = dashboard["years_from_brokerage"] if dashboard else 0
 future_savings_view = dashboard["future_savings_view"] if dashboard else 0
 
-st.session_state.trad_401k_contributions = trad_401k_contributions if trad_401k_contributions else 0
-st.session_state.trad_401k_match_annual = trad_401k_match_annual if trad_401k_match_annual else 0
+st.session_state.trad_401k_contributions_monthly = trad_401k_contributions_monthly if trad_401k_contributions_monthly else 0
+st.session_state.trad_401k_match_monthly = trad_401k_match_monthly if trad_401k_match_monthly else 0
 st.session_state.roth_ira_monthly = roth_ira_monthly if roth_ira_monthly else 0
 st.session_state.roth_401k_contributions_monthly = roth_401k_contributions_monthly if roth_401k_contributions_monthly else 0
 st.session_state.roth_401k_match_monthly = roth_401k_match_monthly if roth_401k_match_monthly else 0
@@ -88,21 +88,21 @@ else:
 annual_income = st.session_state.annual_income
 
 salary_income_prorated = st.session_state.annual_income * (months_worked / 12)
-salary_taxable = utils.get_annual_federal_taxable_income(annual_income = salary_income_prorated,trad_401k_contributions = trad_401k_contributions,standard_deduction = standard_deduction)
+salary_taxable = utils.get_annual_federal_taxable_income(annual_income = salary_income_prorated,trad_401k_contributions_monthly = trad_401k_contributions_monthly,standard_deduction = standard_deduction, months_worked = months_worked)
 salary_federal_tax = utils.calculate_federal_tax(single = single,annual_federal_taxable_income = salary_taxable)
 recommended_withholding = salary_federal_tax / months_worked
 # total income with bonus
-annual_take_home_no_bonus = months_worked*(utils.calculate_monthly_take_home(single = single, annual_income = annual_income,trad_401k_contributions = trad_401k_contributions, standard_deduction = standard_deduction, state_tax_perc = state_tax_perc, local_tax_perc = local_tax_perc, months_worked = months_worked))
+annual_take_home_no_bonus = months_worked*(utils.calculate_monthly_take_home(single = single, annual_income = annual_income,trad_401k_contributions_monthly = trad_401k_contributions_monthly, standard_deduction = standard_deduction, state_tax_perc = state_tax_perc, local_tax_perc = local_tax_perc, months_worked = months_worked))
 annual_taxes_no_bonus = salary_income_prorated - annual_take_home_no_bonus
 adjusted_total_income = st.session_state.annual_income + (annual_bonus * (12 / months_worked))
 total_income = salary_income_prorated + annual_bonus
-annual_take_home_with_bonus = months_worked*(utils.calculate_monthly_take_home(single = single, annual_income = adjusted_total_income,trad_401k_contributions = trad_401k_contributions, standard_deduction = standard_deduction, state_tax_perc = state_tax_perc, local_tax_perc = local_tax_perc, months_worked = months_worked))
+annual_take_home_with_bonus = months_worked*(utils.calculate_monthly_take_home(single = single, annual_income = adjusted_total_income,trad_401k_contributions_monthly = trad_401k_contributions_monthly, standard_deduction = standard_deduction, state_tax_perc = state_tax_perc, local_tax_perc = local_tax_perc, months_worked = months_worked))
 annual_taxes_with_bonus = total_income - annual_take_home_with_bonus
 
 bonus_taxes = annual_taxes_with_bonus - annual_taxes_no_bonus
 # incremental tax caused by bonus
 bonus_after_tax = annual_bonus - bonus_taxes
-st.write(f"NOTE: The following assumes you put ${trad_401k_contributions:,.2f} into your traditional 401k this year. If that is not the case, please update your contribution in dashboard, save, and return here for an accurate view.")
+st.write(f"NOTE: The following assumes you put ${trad_401k_contributions_monthly:,.2f} into your traditional 401k per month. If that is not the case, please update your contribution in dashboard, save, and return here for an accurate view.")
 
 
 
@@ -135,7 +135,7 @@ We recommend setting your federal withholding based on your salary only.
 This keeps your monthly withholding accurate and avoids relying on bonus timing.
 """)
 if months_worked < 12:
-    payroll_annual_federal_taxable_estimate = utils.get_annual_federal_taxable_income(annual_income = annual_income, trad_401k_contributions = trad_401k_contributions, standard_deduction = standard_deduction)
+    payroll_annual_federal_taxable_estimate = utils.get_annual_federal_taxable_income(annual_income = annual_income, trad_401k_contributions_monthly = trad_401k_contributions_monthly, standard_deduction = standard_deduction)
     payroll_federal_tax_estimate = utils.calculate_federal_tax(single = single, annual_federal_taxable_income = payroll_annual_federal_taxable_estimate)
     monthly_payroll_federal_tax_estimate = payroll_federal_tax_estimate/12
     st.write(f"Based on your current paycheck, payroll may withhold approximately, payroll may withhold approximately ${months_worked*monthly_payroll_federal_tax_estimate:,.2f}.")

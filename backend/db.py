@@ -189,7 +189,7 @@ class Database:
         
     def get_dashboard(self, user_id):
         res = self.supabase.table("dashboard") \
-            .select("margin_on_debt_monthly, trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view") \
+            .select("margin_on_debt_monthly, trad_401k_contributions_monthly, trad_401k_match_monthly, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view") \
             .eq("user_id", user_id) \
             .execute()
         
@@ -197,8 +197,8 @@ class Database:
             row = res.data[0]
             return {
                 "margin_on_debt_monthly": row["margin_on_debt_monthly"] if row["margin_on_debt_monthly"] is not None else 0,
-                "trad_401k_contributions": row["trad_401k_contributions"] if row["trad_401k_contributions"] is not None else 0,
-                "trad_401k_match_annual": row["trad_401k_match_annual"] if row["trad_401k_match_annual"] is not None else 0,
+                "trad_401k_contributions_monthly": row["trad_401k_contributions_monthly"] if row["trad_401k_contributions_monthly"] is not None else 0,
+                "trad_401k_match_monthly": row["trad_401k_match_monthly"] if row["trad_401k_match_monthly"] is not None else 0,
                 "roth_ira_monthly": row["roth_ira_monthly"] if row["roth_ira_monthly"] is not None else 0,
                 "roth_401k_contributions_monthly": row["roth_401k_contributions_monthly"] if row["roth_401k_contributions_monthly"] is not None else 0,
                 "roth_401k_match_monthly": row["roth_401k_match_monthly"] if row["roth_401k_match_monthly"] is not None else 0,
@@ -344,8 +344,8 @@ class Database:
         self, 
         user_id, 
         margin_on_debt_monthly,
-        trad_401k_contributions,
-        trad_401k_match_annual,
+        trad_401k_contributions_monthly,
+        trad_401k_match_monthly,
         roth_ira_monthly,
         roth_401k_contributions_monthly,
         roth_401k_match_monthly,
@@ -357,8 +357,8 @@ class Database:
         self.supabase.table("dashboard").upsert({
             "user_id": user_id,
             "margin_on_debt_monthly": margin_on_debt_monthly,
-            "trad_401k_contributions": trad_401k_contributions,
-            "trad_401k_match_annual": trad_401k_match_annual,
+            "trad_401k_contributions_monthly": trad_401k_contributions_monthly,
+            "trad_401k_match_monthly": trad_401k_match_monthly,
             "roth_ira_monthly": roth_ira_monthly,
             "roth_401k_contributions_monthly": roth_401k_contributions_monthly,
             "roth_401k_match_monthly": roth_401k_match_monthly,
