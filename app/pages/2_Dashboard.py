@@ -174,7 +174,7 @@ if st.session_state.savings > six_month_expenses:
 age = datetime.today().date() - st.session_state.birthdate
 
 salary_income_prorated = st.session_state.annual_income * (months_worked / 12)
-salary_taxable = utils.get_annual_federal_taxable_income(annual_income = salary_income_prorated,trad_401k_contributions_monthly = trad_401k_contributions_monthly,standard_deduction = standard_deduction months_worked = months_worked)
+salary_taxable = utils.get_annual_federal_taxable_income(annual_income = salary_income_prorated,trad_401k_contributions_monthly = trad_401k_contributions_monthly,standard_deduction = standard_deduction, months_worked = months_worked)
 salary_federal_tax = utils.calculate_federal_tax(single = single,annual_federal_taxable_income = salary_taxable)
 recommended_withholding = salary_federal_tax / months_worked
 # total income with bonus
