@@ -72,7 +72,7 @@ if st.session_state.email:
     marriage_status = st.radio("What is your marriage status?", ["single", "married"])
     st.session_state.marriage_status = marriage_status
     
-    st.write("Please all of your monthly expenses. Include rent/mortgage, property taxes, debt minimum payments, and all other required expenses. You may also include fun spending or any other category that you will allocate as an expense.")
+    st.write("Please list all of your monthly expenses. Include (if applicable) rent/mortgage, property taxes, debt minimum payments, and all other required monthly expenses. Additionally, include any want related spending (i.e., non necessities) that you plan to spend money on.")
     if 'expenses_df' not in st.session_state:
         st.session_state.expenses_df = pd.DataFrame(columns = ["category", "amount"])
     
@@ -89,11 +89,6 @@ if st.session_state.email:
             st.warning("Please enter an expense")
             
     st.write("### Monthly Expenses:", st.session_state.expenses_df)
-    # not in debt
-    if "debt_df" in st.session_state and st.session_state.debt_df.empty:
-        st.caption("Include both needs and wants.")
-    else:
-        st.caption("Include both needs and wants. Also, include minimum payment on each debt item(s) you have.")
     st.session_state.expenses_df["Delete"] = False
     st.write("Edit or delete expenses here:")
     st.session_state.expenses_df = st.data_editor(st.session_state.expenses_df, num_rows = "dynamic", use_container_width=True)
