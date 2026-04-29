@@ -141,19 +141,9 @@ if "data_loaded" not in st.session_state:
     st.session_state.data_loaded = True
 
 st.title("Help Page:")
-consent = st.selectbox(
-    "Allow the AI assistant to access your financial data for more personalized help?",
-    options=["no", "yes"]
-)
-st.caption(
-    "If you choose 'yes', the assistant will use your inputs (income, expenses, assets, etc.) to give better recommendations. "
-    "Your data is only used within this app and is not shared externally. "
-    "You can still use the assistant without sharing your data."
-)
-st.session_state.consent = consent
-st.write("Please give a second for responses to load.")
+st.caption("Please give a second for responses to load.")
 
-def build_user_context_data_consent():
+def build_user_context_data():
     return f"""
 Here is the user's financial data:
 
@@ -185,9 +175,6 @@ Goals:
 - {st.session_state.get("goals", [])}
 """
 
-def build_user_context_no_consent():
-    return "The user has not shared financial data. Provide general guidance only."
-
 def stream_response(stream):
     for chunk in stream:
         if chunk.choices[0].delta.content:
@@ -206,10 +193,7 @@ if prompt := st.chat_input("How can I help?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-    if st.session_state.consent == "yes":
-        user_context = build_user_context_data_consent()
-    else:
-        user_context = build_user_context_no_consent()
+    user_context = build_user_context_data()
     with st.chat_message("assistant"):
         stream = client.chat(
             messages=[
