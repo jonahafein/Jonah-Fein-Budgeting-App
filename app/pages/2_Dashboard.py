@@ -438,7 +438,7 @@ else:
     }
     dashboard_df2 = pd.DataFrame(dashboard_dict2, index=[0])
 
-st.subheader("Monthly Allocation Plan:")
+st.subheader("Monthly Margin Allocation Plan:")
 st.dataframe(dashboard_df1) 
 st.dataframe(dashboard_df2)
 
