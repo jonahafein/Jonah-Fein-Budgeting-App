@@ -215,7 +215,7 @@ elif "debt_df" in st.session_state and not st.session_state.debt_df.empty and st
             st.write(f"Your monthly margin this month should be roughly ${monthly_margin:,.2f} dollars (assuming no investing). It should take you about {max((max(st.session_state.debt_df["Balance"].sum() - difference),0)/max(monthly_margin,1), 1):,.0f} months to be out of debt.")
         elif difference >= st.session_state.debt_df["Balance"].sum() and difference < three_month_expenses:
             st.write("You should be out of debt after that step!")
-            st.write("Now, we recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
+            st.write("Next, we recommend you temporarily pause all saving and investing (including retirement) and put your entire monthly margin at building up at least 3 months of expenses in savings.")
             savings_remainder = st.session_state.savings - st.session_state.debt_df["Balance"].sum()
             st.write(f"You should now have roughly ${savings_remainder:,.2f} savings with a monthly margin of ${monthly_margin:,.2f} (assuming no investing). Three months of expenses for you is approximately ${three_month_expenses:,.2f}. It should take you roughly {max((three_month_expenses - savings_remainder)/max(monthly_margin,1), 1):.0f} months to have 3 months of expenses saved.")
         else:
