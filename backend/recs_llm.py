@@ -76,15 +76,9 @@ FORMAT RULES (VERY IMPORTANT):
 - Always include proper spacing between numbers and words
 - Always write in clean, readable sentences
 - Use standard bullet points with normal spacing
-
----
-
-OUTPUT FORMAT:
-
-- Use bullet points
-- Each bullet should be 1–2 sentences max
-- Use clean spacing and punctuation
-- Write like a human financial advisor, not compressed text
+- Do NOT use *, -, or markdown bullets
+- Return each recommendation on a NEW LINE
+- Each line should be a complete sentence
 
 --- 
 

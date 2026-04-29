@@ -274,7 +274,12 @@ response = client.chat(
 
 recommendations = clean_text(response.choices[0].message.content)
 
-st.write(recommendations)
+lines = recommendations.split("\n")
+
+for line in lines:
+    line = line.strip()
+    if line:
+        st.markdown(f"- {line}")
 
 st.write(f"We recommend you withhold approximately ${recommended_withholding:,.2f} per month for federal income tax (excludes state/local & FICA).")
 if bonus_taxes > 0:
