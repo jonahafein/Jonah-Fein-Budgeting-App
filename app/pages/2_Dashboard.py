@@ -232,7 +232,8 @@ Breakdown:
 {st.session_state.expenses_df.to_dict(orient="records")}
 
 Assets:
-- Savings: {st.session_state.get("savings", 0)}
+- Savings: {st.session_state.get("savings", 0)} (Remember, this is all of their savings. We don't ask for emergency savings verse regular savings. If their savings = emergency fund target, then they 
+have a fully funded emergency fund and no savings beyond that. If savings < emergency fund target, then they need emergency fund target - current savings. If savings > emergency fund target, they have savings - emergency fund target in regular savings beyond their emergency fund).
 - Brokerage: {st.session_state.get("brokerage", 0)}
 - Retirement: {st.session_state.get("retirement", 0)}
 
