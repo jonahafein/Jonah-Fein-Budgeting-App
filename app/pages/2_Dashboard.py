@@ -321,7 +321,7 @@ else:
     st.write(f"Before any investing, you will have approximately ${baseline_monthly_margin:,.2f} a month in margin.")
     margin_on_debt_monthly = 0
     
-trad_401k_contributions = st.slider("How much would you like to contribute to your traditional 401k this calendar year? (if you have a roth 401k, we recommend you max that out first). You will have a chance to input contributions to other accounts under financial projections.", max_value=int(12*(baseline_monthly_margin - margin_on_debt_monthly)), step=1, value = st.session_state.trad_401k_contributions)
+trad_401k_contributions = st.slider("How much would you like to contribute to your traditional 401k this calendar year? (if you have a roth 401k, we recommend you max that out first)", max_value=int(12*(baseline_monthly_margin - margin_on_debt_monthly)), step=1, value = st.session_state.trad_401k_contributions)
 trad_401k_match_annual = 0
 if trad_401k_contributions > 0:
     trad_401k_match_annual = st.slider(f"How much will your employer match of the ${trad_401k_contributions} you put into your traditional 401k this year?", max_value = trad_401k_contributions, step=1, value = st.session_state.trad_401k_match_annual)   
