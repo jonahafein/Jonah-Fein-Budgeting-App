@@ -61,6 +61,7 @@ st.session_state.months_worked = months_worked
 
 # add all else to session_state
 dashboard = db.get_dashboard(user_id)
+margin_on_debt_monthly = dashboard["margin_on_debt_monthly"] if dashboard else 0
 trad_401k_contributions = dashboard["trad_401k_contributions"] if dashboard else 0
 trad_401k_match_annual = dashboard["trad_401k_match_annual"] if dashboard else 0
 roth_ira_monthly = dashboard["roth_ira_monthly"] if dashboard else 0
@@ -71,6 +72,7 @@ brokerage_contributions_monthly = dashboard["brokerage_contributions_monthly"] i
 years_from_brokerage = dashboard["years_from_brokerage"] if dashboard else 0
 future_savings_view = dashboard["future_savings_view"] if dashboard else 0
 
+st.session_state.margin_on_debt_monthly = margin_on_debt_monthly if margin_on_debt_monthly else 0
 st.session_state.trad_401k_contributions = trad_401k_contributions if trad_401k_contributions else 0
 st.session_state.trad_401k_match_annual = trad_401k_match_annual if trad_401k_match_annual else 0
 st.session_state.roth_ira_monthly = roth_ira_monthly if roth_ira_monthly else 0
@@ -80,11 +82,25 @@ st.session_state.years_from_retirement = years_from_retirement if years_from_ret
 st.session_state.brokerage_contributions_monthly = brokerage_contributions_monthly if brokerage_contributions_monthly else 0
 st.session_state.years_from_brokerage = years_from_brokerage if years_from_brokerage else 0
 st.session_state.future_savings_view = future_savings_view if future_savings_view else 0
+
+# settings:
+settings = db.get_settings(user_id)
+debt_aggression = settings["debt_aggression"] if settings else "extremely"
+emergency_importance = settings["emergency_importance"] if settings else "extremely"
+ai_permission = settings["ai_permission"] if settings else "no"
+investing_aggression = settings["investing_aggression"] if settings else "balanced"
+bonus_strategy = settings["bonus_strategy"] if settings else "save"
+
+st.session_state.debt_aggression = debt_aggression if debt_aggression else "extremely"
+st.session_state.emergency_importance = emergency_importance if emergency_importance else "extremely"
+st.session_state.ai_permission = ai_permission if ai_permission else "no"
+st.session_state.investing_aggression = investing_aggression if investing_aggression else "balanced"
+st.session_state.bonus_strategy = bonus_strategy if bonus_strategy else "save"
     
 # now let's load assets and goals:
 assets = db.get_non_home_assets(user_id)
 home_data = db.get_home(user_id)
-goals = db.get_goals(user_id)
+goals_df = db.get_goals(user_id)
 debt_df = db.get_debts(user_id)
 st.session_state.savings = assets["savings"] if assets else 0
 st.session_state.apy = assets["apy"] if assets else 0
@@ -92,7 +108,6 @@ st.session_state.brokerage = assets["brokerage"] if assets else 0
 st.session_state.brokerage_returns = assets["brokerage_returns"] if assets else 0
 st.session_state.retirement = assets["retirement"] if assets else 0
 st.session_state.retirement_returns = assets["retirement_returns"] if assets else 0
-st.session_state.goals = goals if goals else []
 st.session_state.home_data = home_data if home_data else None
 if home_data:
     st.session_state.years = home_data["years"]
@@ -115,6 +130,14 @@ if debt_df:
     }for d in debt_df])
 else:
     st.session_state.debt_df = pd.DataFrame(columns = ["Item", "Balance", "Interest Rate"])
+    
+if goals_df:
+    st.session_state.goals_df = pd.DataFrame([{
+        "goal_name": goal["goal_name"],
+        "target_amount": goal["target_amount"],
+        "timeline_years": goal["timeline_years"],
+        "priority": goal["priority"]
+    }for goal in goals_df])
     
 if st.session_state.marriage_status =="single":
     standard_deduction = 16100
@@ -142,33 +165,25 @@ if six_month_expenses_met:
 else:
     six_month_gap = six_month_expenses - st.session_state.savings
     six_month_expenses_met = f"❌ - {six_month_gap:,.2f} dollars away."
+    
+if "goals_df" not in st.session_state:
+    st.session_state.goals_df = pd.DataFrame(columns = ["goal_name", "target_amount", "timeline_years", "priority", "delete"])
 
 # determining if ready for step 4:
 continue_on_step4 = False 
 if "debt_df" in st.session_state and st.session_state.debt_df.empty and st.session_state.savings > three_month_expenses:
     continue_on_step4 = True
     
+    
 # snapshot
 st.subheader("Your Current Financial Snapshot:")
 net_worth = utils.calculate_net_worth(home_value = st.session_state.home_value, home_debt = st.session_state.home_balance, savings = st.session_state.savings, brokerage = st.session_state.brokerage, retirement = st.session_state.retirement, debt_total = st.session_state.debt_df["Balance"].sum())
 st.write(f"Net Worth: ${net_worth:,.2f}")
-# put some 401k slider in here
-if continue_on_step4 == False:
-    trad_401k_contributions = 0
-    monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = trad_401k_contributions, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
-    monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
-else:
-    # TODO: implement slider for 401k contributions! (remember to get match in here)
-    dummy_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
-    dummy_monthly_margin = utils.calculate_monthly_margin(monthly_take_home = dummy_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = 0, months_worked = months_worked)
-    trad_401k_contributions = st.slider("How much would you like to contribute to your traditional 401k this calendar year? (if you have a roth 401k, we recommend you max that out first). You will have a chance to input contributions to other accounts under financial projections.", max_value=int(12*(dummy_monthly_margin)), step=1, value = st.session_state.trad_401k_contributions)
-    trad_401k_match_annual = 0
-    if trad_401k_contributions > 0:
-        trad_401k_match_annual = st.slider(f"How much will your employer match of the ${trad_401k_contributions} you put into your traditional 401k this year?", max_value = trad_401k_contributions, step=1, value = st.session_state.trad_401k_match_annual)
-    st.session_state.trad_401k_match_annual = trad_401k_match_annual
-    monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = trad_401k_contributions, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
-    monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
-st.write(f"Your monthly margin (post traditional 401k): ${monthly_margin}")
+trad_401k_contributions = 0
+monthly_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = trad_401k_contributions, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
+monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
+st.write(f"Your monthly margin (before any traditional 401k investing): ${monthly_margin}")
+
 # check or x if reached, if x by how much
 st.write(f"3 month emergency fund: ${three_month_expenses:,.2f}", three_month_expenses_met)
 st.write(f"6 month emergency fund: ${six_month_expenses:,.2f}", six_month_expenses_met)
@@ -200,7 +215,6 @@ if bonus_after_tax > 0:
 
 # for each of these, add an estimated time to completion for goals
 st.subheader("Recommendations:")
-
 # baby step 1
 if st.session_state.savings < 1000:
     st.write("We recommend that for now, you pause investing (including for retirement), and put all of your monthly margin towards building a $1000 starter emergency fund.")
@@ -237,7 +251,7 @@ elif continue_on_step4:
     # TODO: logic for house, logic for moving on to step 7 (will need bool defined above and mutable here), slider for investing aggression, saving up to 6 mo, etc.
     # have active mortgage
     if st.session_state.home_balance > 0 and st.session_state.home_value > 0:
-        st.write("Congratulations! You aren't in debt. We recommend you invest roughly 15% of your annual income into retirement, and put some of your extra margin on paying off your house early.")
+        st.write("Congratulations! You aren't in debt. Based on your investing goals, we recommend you invest roughly 15% of your annual income into retirement, and put some of your extra margin on paying off your house early.")
         fifteen_perc_annual = float(0.15*st.session_state.annual_income)
         fifteen_perc_monthly = float(fifteen_perc_annual/12)
         st.write(f"15% of your annual income is ${fifteen_perc_annual:,.2f} which is roughly ${fifteen_perc_monthly:,.2f} a month.")
@@ -311,90 +325,125 @@ This section simulates various scenarios to help you set goals and allocate your
 **NOTE:** This section assumes you never get a raise, which is very unlikely, and it does **not** include your annual bonus, so projections are likely underestimates.
 """)
     
-if continue_on_step4:
-    st.write(f"Recall, under the assumption that you put ${trad_401k_contributions:,.2f} annually (which is ${float(trad_401k_contributions/months_worked):,.2f} a month) into a traditional 401k this year, you will have ${monthly_margin:,.2f} left a month. (Note: margin here is defined as post traditional 401k contributions).")
-    roth_ira_monthly = st.slider("How much will you put into your roth (and/or traditional) ira a month?", max_value=int(monthly_margin), value = st.session_state.roth_ira_monthly)
-    roth_401k_contributions_monthly = st.slider("How much will you put into a roth 401k a month? (ignore if you don't have a roth 401k).", max_value=int(monthly_margin - roth_ira_monthly), step=1, value = st.session_state.roth_401k_contributions_monthly)
-    roth_401k_match_monthly = 0
-    if roth_401k_contributions_monthly > 0:
-        roth_401k_match_monthly = st.slider(f"How much will your employer match of the ${roth_401k_contributions_monthly} you put into your roth 401k this month?", max_value = roth_401k_contributions_monthly, step=1, value = st.session_state.roth_401k_match_monthly)
-    st.session_state.roth_401k_match_monthly = roth_401k_match_monthly
-    years_from_retirement = st.slider("Approximately how much years are you from retirement?", value = st.session_state.years_from_retirement)
-    # formula for total in retirement: P(1+r)^t + PMT*(((1+r)^t -1))/r) -- P = current total, r = Annual interest rate (divided by 12 for monthly), t = Total number of years (multiplied by 12 for months), PMT = monthly investment amount
-    P = st.session_state.retirement
-    r_nominal = (st.session_state.retirement_returns / 100) / 12
-    r_real = ((1 + st.session_state.retirement_returns/100) / (1 + 0.04)) - 1
-    r_real = r_real / 12
-    t = years_from_retirement*12
-    PMT = trad_401k_contributions/months_worked + trad_401k_match_annual/months_worked + roth_ira_monthly + roth_401k_contributions_monthly + roth_401k_match_monthly
-    if r_nominal == 0:
-        total_in_retirement_nominal = P + t*PMT
-    else:
-        total_in_retirement_nominal = P * (1 + r_nominal)**t + PMT * (((1 + r_nominal)**t - 1) / r_nominal)
-    if r_real == 0:
-        total_in_retirement_real = P + PMT * t
-    else:
-        total_in_retirement_real = P * (1 + r_real)**t + PMT * (((1 + r_real)**t - 1) / r_real)
-    st.write(f"You will have approximately ${total_in_retirement_nominal:,.2f} nominal in retirement when you retire. That is the equivalent of ${total_in_retirement_real:,.2f} today's value if we assume inflation will average 4% annually.")
-    # now brokerage, and remainder savings
-    st.write(f"Margin left after retirement investing: ${monthly_margin - roth_ira_monthly - roth_401k_contributions_monthly:,.2f}")
-    brokerage_contributions_monthly = st.slider("How much will you put into a your brokerage monthly?", max_value=int(monthly_margin - roth_ira_monthly - roth_401k_contributions_monthly), step=1, value = st.session_state.brokerage_contributions_monthly)
-    years_from_brokerage = st.slider("Approximately how much years are you from liquidating your brokerage?", value = st.session_state.years_from_brokerage)
-    P = st.session_state.brokerage
-    r_nominal = (st.session_state.brokerage_returns / 100) / 12
-    r_real = ((1 + st.session_state.brokerage_returns/100) / (1 + 0.04)) - 1
-    r_real = r_real / 12
-    t = years_from_brokerage*12
-    PMT = brokerage_contributions_monthly
-    if r_nominal == 0:
-        total_in_brokerage_nominal = P + t*PMT
-    else:
-        total_in_brokerage_nominal = P * (1 + r_nominal)**t + PMT * (((1 + r_nominal)**t - 1) / r_nominal)
-    if r_real == 0:
-        total_in_brokerage_real = P + PMT * t
-    else:
-        total_in_brokerage_real = P * (1 + r_real)**t + PMT * (((1 + r_real)**t - 1) / r_real)
-    st.write(f"You will have approximately ${total_in_brokerage_nominal:,.2f} nominal in your brokerage when you liquidate. That is the equivalent of ${total_in_brokerage_real:,.2f} today's value if we assume inflation will average 4% annually.")
-    #st.error if we go above margin (ADD in to above)
-    st.write(f"Under this plan, after all investing you will have ${monthly_margin - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly:,.2f} for savings or further spending (once again, not including bonus).")
-    future_savings_view = st.slider("How many months ahead would you like to look at your expected savings total?", max_value = 700, value = st.session_state.future_savings_view)
-    P = st.session_state.savings
-    r_nominal = (st.session_state.apy / 100) / 12
-    r_real = ((1 + st.session_state.apy/100) / (1 + 0.04)) - 1
-    r_real = r_real / 12
-    t = future_savings_view
-    PMT = monthly_margin - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly
-    if r_nominal == 0:
-        total_in_savings_nominal = P + t*PMT
-    else:
-        total_in_savings_nominal = P * (1 + r_nominal)**t + PMT * (((1 + r_nominal)**t - 1) / r_nominal)
-    if r_real == 0:
-        total_in_savings_real = P + PMT * t
-    else:
-        total_in_savings_real = P * (1 + r_real)**t + PMT * (((1 + r_real)**t - 1) / r_real)
-    st.write(f"In {future_savings_view} months,  you will have approximately ${total_in_savings_nominal:,.2f}. That is the equivalent of ${total_in_savings_real:,.2f} today's value.")
-    if st.button("Save dashboard projections values"):
-        st.session_state.profile = {
-            "email": st.session_state.email,
-            "trad_401k_contributions": trad_401k_contributions,
-            "trad_401k_match_annual": trad_401k_match_annual,
-            "roth_ira_monthly": roth_ira_monthly,
-            "roth_401k_contributions_monthly": roth_401k_contributions_monthly,
-            "roth_401k_match_monthly": roth_401k_match_monthly,
-            "years_from_retirement": years_from_retirement,
-            "brokerage_contributions_monthly": brokerage_contributions_monthly,
-            "years_from_brokerage": years_from_brokerage,
-            "future_savings_view": future_savings_view
-        }
-        db = Database()
-        user_id = db.get_user(st.session_state.email)["user_id"]
-        db.update_dashboard(user_id, trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view)
-        st.success("Dashboard projection values saved!")
+# now lets get all the user inputs:
+# if user has debt:
+if st.session_state.debt_df is not None and not st.session_state.debt_df.empty and st.session_state.debt_df["Balance"].sum() > 0:
+    baseline_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
+    baseline_monthly_margin = utils.calculate_monthly_margin(monthly_take_home = baseline_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = 0, months_worked = months_worked)
+    st.write(f"Before any tax-adjusted investing, you will have approximately ${baseline_monthly_margin:,.2f} a month in margin.")
+    margin_on_debt_monthly = st.slider("How much of your monthly margin would you like to put on your debt? (meaning, money in addition to minimum payments)", max_value=int(baseline_monthly_margin), step=1, value = st.session_state.margin_on_debt_monthly)
+    st.write(f"You have ${baseline_monthly_margin - margin_on_debt_monthly:,.2f} monthly margin left after your monthly additional debt payment.")
+    
 else:
-    if st.session_state.debt_df["Balance"].sum() > 0:
-        st.write("NOTE: This section will be left blank for now until you are fully out of debt and have built up at least 3 months of expenses saved.")
-    elif st.session_state.debt_df["Balance"].sum() == 0 and st.session_state.savings < three_month_expenses:
-        st.write("NOTE: This section will be left blank for now until you have built up at least 3 months of expenses saved. See additional notes for further explanation.")
+    # else no margin goes to debt
+    baseline_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = 0, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
+    baseline_monthly_margin = utils.calculate_monthly_margin(monthly_take_home = baseline_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = 0, months_worked = months_worked)
+    st.write(f"Before any investing, you will have approximately ${baseline_monthly_margin:,.2f} a month in margin.")
+    margin_on_debt_monthly = 0
+    
+trad_401k_contributions = st.slider("How much would you like to contribute to your traditional 401k this calendar year? (if you have a roth 401k, we recommend you max that out first). You will have a chance to input contributions to other accounts under financial projections.", max_value=int(12*(baseline_monthly_margin - margin_on_debt_monthly)), step=1, value = st.session_state.trad_401k_contributions)
+trad_401k_match_annual = 0
+if trad_401k_contributions > 0:
+    trad_401k_match_annual = st.slider(f"How much will your employer match of the ${trad_401k_contributions} you put into your traditional 401k this year?", max_value = trad_401k_contributions, step=1, value = st.session_state.trad_401k_match_annual)   
+
+real_take_home = utils.calculate_monthly_take_home(single = single, annual_income = annual_income, trad_401k_contributions = trad_401k_contributions, standard_deduction = standard_deduction, state_tax_perc = st.session_state.state_tax_perc, local_tax_perc = st.session_state.local_tax_perc, months_worked = st.session_state.months_worked)
+real_monthly_margin = utils.calculate_monthly_margin(monthly_take_home = real_take_home, expenses_df = st.session_state.expenses_df, trad_401k_contributions = trad_401k_contributions, months_worked = months_worked)
+
+# in debt:
+if st.session_state.debt_df is not None and not st.session_state.debt_df.empty and st.session_state.debt_df["Balance"].sum() > 0:
+    st.write(f"You have ${real_monthly_margin - margin_on_debt_monthly:,.2f} left after your monthly additional debt payment and 401k contributions.")
+else:
+    st.write(f"You have ${real_monthly_margin - margin_on_debt_monthly:,.2f} left after your monthly 401k contributions.")  
+
+
+# retirement
+roth_ira_monthly = st.slider("How much will you put into your roth (and/or traditional) ira a month?", max_value=int(real_monthly_margin - margin_on_debt_monthly - trad_401k_contributions/12), value = st.session_state.roth_ira_monthly)
+st.write(f"You now have ${real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly:,.2f} left a month.")
+roth_401k_contributions_monthly = st.slider("How much will you put into a roth 401k a month? (ignore if you don't have a roth 401k).", max_value=int(real_monthly_margin - margin_on_debt_monthly - trad_401k_contributions/12 - roth_ira_monthly), step=1, value = st.session_state.roth_401k_contributions_monthly)
+st.write(f"You now have ${real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly:,.2f} left a month.")
+roth_401k_match_monthly = 0
+if roth_401k_contributions_monthly > 0:
+    roth_401k_match_monthly = st.slider(f"How much will your employer match of the ${roth_401k_contributions_monthly} you put into your roth 401k this month?", max_value = roth_401k_contributions_monthly, step=1, value = st.session_state.roth_401k_match_monthly)
+st.session_state.roth_401k_match_monthly = roth_401k_match_monthly
+years_from_retirement = st.slider("Approximately how much years are you from retirement?", value = st.session_state.years_from_retirement)
+
+# formula for total in retirement: P(1+r)^t + PMT*(((1+r)^t -1))/r) -- P = current total, r = Annual interest rate (divided by 12 for monthly), t = Total number of years (multiplied by 12 for months), PMT = monthly investment amount
+P = st.session_state.retirement
+r_nominal = (st.session_state.retirement_returns / 100) / 12
+r_real = ((1 + st.session_state.retirement_returns/100) / (1 + 0.04)) - 1
+r_real = r_real / 12
+t = years_from_retirement*12
+PMT = trad_401k_contributions/months_worked + trad_401k_match_annual/months_worked + roth_ira_monthly + roth_401k_contributions_monthly + roth_401k_match_monthly
+if r_nominal == 0:
+    total_in_retirement_nominal = P + t*PMT
+else:
+    total_in_retirement_nominal = P * (1 + r_nominal)**t + PMT * (((1 + r_nominal)**t - 1) / r_nominal)
+if r_real == 0:
+    total_in_retirement_real = P + PMT * t
+else:
+    total_in_retirement_real = P * (1 + r_real)**t + PMT * (((1 + r_real)**t - 1) / r_real)
+st.write(f"You will have approximately ${total_in_retirement_nominal:,.2f} nominal in retirement when you retire. That is the equivalent of ${total_in_retirement_real:,.2f} today's value if we assume inflation will average 4% annually.")
+
+# brokerage
+st.write(f"You now have ${real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly:,.2f} left a month.")
+brokerage_contributions_monthly = st.slider("How much will you put into a your brokerage monthly?", max_value=int(real_monthly_margin - margin_on_debt_monthly - trad_401k_contributions/12 - roth_ira_monthly - roth_401k_contributions_monthly), step=1, value = st.session_state.brokerage_contributions_monthly)
+years_from_brokerage = st.slider("Approximately how much years are you from liquidating your brokerage?", value = st.session_state.years_from_brokerage)
+P = st.session_state.brokerage
+r_nominal = (st.session_state.brokerage_returns / 100) / 12
+r_real = ((1 + st.session_state.brokerage_returns/100) / (1 + 0.04)) - 1
+r_real = r_real / 12
+t = years_from_brokerage*12
+PMT = brokerage_contributions_monthly
+if r_nominal == 0:
+    total_in_brokerage_nominal = P + t*PMT
+else:
+    total_in_brokerage_nominal = P * (1 + r_nominal)**t + PMT * (((1 + r_nominal)**t - 1) / r_nominal)
+if r_real == 0:
+    total_in_brokerage_real = P + PMT * t
+else:
+    total_in_brokerage_real = P * (1 + r_real)**t + PMT * (((1 + r_real)**t - 1) / r_real)
+st.write(f"You will have approximately ${total_in_brokerage_nominal:,.2f} nominal in your brokerage when you liquidate. That is the equivalent of ${total_in_brokerage_real:,.2f} today's value if we assume inflation will average 4% annually.")
+#st.error if we go above margin (ADD in to above)
+st.write(f"You now have ${real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly:,.2f} left a month for savings.")
+future_savings_view = st.slider("How many months ahead would you like to look at your expected savings total?", max_value = 700, value = st.session_state.future_savings_view)
+P = st.session_state.savings
+r_nominal = (st.session_state.apy / 100) / 12
+r_real = ((1 + st.session_state.apy/100) / (1 + 0.04)) - 1
+r_real = r_real / 12
+t = future_savings_view
+PMT = real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly
+if r_nominal == 0:
+    total_in_savings_nominal = P + t*PMT
+else:
+    total_in_savings_nominal = P * (1 + r_nominal)**t + PMT * (((1 + r_nominal)**t - 1) / r_nominal)
+if r_real == 0:
+    total_in_savings_real = P + PMT * t
+else:
+    total_in_savings_real = P * (1 + r_real)**t + PMT * (((1 + r_real)**t - 1) / r_real)
+st.write(f"In {future_savings_view} months,  you will have approximately ${total_in_savings_nominal:,.2f}. That is the equivalent of ${total_in_savings_real:,.2f} today's value.")
+
+remaining = real_monthly_margin - margin_on_debt_monthly - roth_ira_monthly - roth_401k_contributions_monthly - brokerage_contributions_monthly
+if remaining < 0:
+    st.error("You are allocating more than your available monthly margin.")
+
+if st.button("Save dashboard projections values"):
+    st.session_state.profile = {
+        "email": st.session_state.email,
+        "trad_401k_contributions": trad_401k_contributions,
+        "trad_401k_match_annual": trad_401k_match_annual,
+        "roth_ira_monthly": roth_ira_monthly,
+        "roth_401k_contributions_monthly": roth_401k_contributions_monthly,
+        "roth_401k_match_monthly": roth_401k_match_monthly,
+        "years_from_retirement": years_from_retirement,
+        "brokerage_contributions_monthly": brokerage_contributions_monthly,
+        "years_from_brokerage": years_from_brokerage,
+        "future_savings_view": future_savings_view
+    }
+    db = Database()
+    user_id = db.get_user(st.session_state.email)["user_id"]
+    db.update_dashboard(user_id, margin_on_debt_monthly, trad_401k_contributions, trad_401k_match_annual, roth_ira_monthly, roth_401k_contributions_monthly, roth_401k_match_monthly, years_from_retirement, brokerage_contributions_monthly, years_from_brokerage, future_savings_view)
+    st.success("Dashboard projection values saved!")
+
         
 
     
