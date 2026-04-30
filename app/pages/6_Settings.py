@@ -44,7 +44,7 @@ if st.session_state.email:
     idx_emergency = debt_and_emergency.index(st.session_state.emergency_importance)
     debt_aggression = st.selectbox("How aggressive are you willing to be with paying off your debt? (ignore if you don't have any debt)", options = ("extremely", "moderately", "minimally"), index = idx_debt_agg)
     st.session_state.debt_aggression = debt_aggression
-    months_emergency_desire = st.slider("Ideally, how many months of expenses would you consider to be suffient savings for your emergency fund?", value = st.session_state.months_emergency_desire)
+    months_emergency_desire = st.slider("Ideally, how many months of expenses would you consider to be suffient savings for your emergency fund?", value = st.session_state.months_emergency_desire, max_value = 36)
     emergency_importance = st.selectbox("How important is having a sufficient emergency fund to you?", options = ("extremely", "moderately", "minimally"), index = idx_emergency)
     st.session_state.emergency_importance = emergency_importance
     investing_choice = ("conservative", "balanced", "aggressive")

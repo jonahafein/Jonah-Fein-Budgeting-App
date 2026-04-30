@@ -34,7 +34,7 @@ if not st.session_state.get("email"):
 
 st.title("Account Dashboard")
 
-st.write("Fill out the other two pages fully before returning here for best results. If you take any of our recommendations, or make any changes, be sure to update the other pages before returning here. Refer to the help page for assistance, logic behind recommendations, concept explanations, and additional resources. Please wait a few seconds for this dashboard to load.")
+st.write("NOTE: fill out the other three pages fully before returning here for best results. If you take any of our recommendations, or make any changes, be sure to update the other pages before returning here. Refer to the help page for assistance, logic behind recommendations, concept explanations, and additional resources. Please wait a few seconds for this dashboard to load.")
 
 # getting their user_id  
 db = Database()
