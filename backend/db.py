@@ -88,7 +88,7 @@ class Database:
     
     def get_settings(self, user_id):
         res = self.supabase.table("settings") \
-            .select("debt_aggression, emergency_importance, investing_aggression, bonus_strategy") \
+            .select("debt_aggression, months_emergency_desire, emergency_importance, investing_aggression, bonus_strategy") \
             .eq("user_id", user_id) \
             .execute()
         
@@ -96,6 +96,7 @@ class Database:
             row = res.data[0]
             return {
                 "debt_aggression": row["debt_aggression"] if row["debt_aggression"] is not None else "extremely",
+                "months_emergency_desire": row["months_emergency_desire"] if row["months_emergency_desire"] is not None else 3,
                 "emergency_importance": row["emergency_importance"] if row["emergency_importance"] is not None else "extremely",
                 "investing_aggression": row["investing_aggression"] if row["investing_aggression"] is not None else "balanced",
                 "bonus_strategy": row["bonus_strategy"] if row["bonus_strategy"] is not None else "save"
@@ -233,10 +234,11 @@ class Database:
             "retirement_returns": retirement_returns
         }).execute()
     
-    def update_settings(self, user_id, debt_aggression, emergency_importance, investing_aggression, bonus_strategy):
+    def update_settings(self, user_id, debt_aggression, months_emergency_desire, emergency_importance, investing_aggression, bonus_strategy):
         self.supabase.table("settings").upsert({
             "user_id": user_id,
             "debt_aggression": debt_aggression,
+            "months_emergency_desire": months_emergency_desire,
             "emergency_importance": emergency_importance,
             "investing_aggression": investing_aggression,
             "bonus_strategy": bonus_strategy

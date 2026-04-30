@@ -102,6 +102,20 @@ st.session_state.brokerage_contributions_monthly = brokerage_contributions_month
 st.session_state.years_from_brokerage = years_from_brokerage if years_from_brokerage else 0
 st.session_state.future_savings_view = future_savings_view if future_savings_view else 0
 
+# settings:
+settings = db.get_settings(user_id)
+debt_aggression = settings["debt_aggression"] if settings else "extremely"
+months_emergency_desire = settings["months_emergency_desire"] if settings else 3
+emergency_importance = settings["emergency_importance"] if settings else "extremely"
+investing_aggression = settings["investing_aggression"] if settings else "balanced"
+bonus_strategy = settings["bonus_strategy"] if settings else "save"
+
+st.session_state.debt_aggression = debt_aggression if debt_aggression else "extremely"
+st.session_state.months_emergency_desire = months_emergency_desire if months_emergency_desire else 3
+st.session_state.emergency_importance = emergency_importance if emergency_importance else "extremely"
+st.session_state.investing_aggression = investing_aggression if investing_aggression else "balanced"
+st.session_state.bonus_strategy = bonus_strategy if bonus_strategy else "save"
+
     
 # now let's load assets and goals:
 assets = db.get_non_home_assets(user_id)
@@ -250,7 +264,8 @@ Goals:
 
 User Preferences:
 debt agression (or willingness to pay extra on debt): {st.session_state.get("debt_aggression", "extremely")}
-Importance of having 3-6 months of expenses saved: {st.session_state.get("emergency_importance", "extremely")}
+Ideal months of expenses saved in emergency fund: {st.session_state.get("months_emergency_desire", 3)}
+Importance of having a sufficient emergency fund: {st.session_state.get("emergency_importance", "extremely")}
 Investing aggression: {st.session_state.get("investing_aggression", "balanced")}
 Do they want to save, invest, or split bonus: {st.session_state.get("bonus_strategy", "save")}
 
