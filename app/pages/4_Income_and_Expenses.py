@@ -2,9 +2,30 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
+from datetime import date
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from backend.db import Database
+
+from backend.spend_analysis_llm import ai_recs_spending
+
+import re
+
+def clean_text(text):
+    import re
+    text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text) # bold
+    text = re.sub(r'\*([^*]+)\*', r'\1', text) # italics
+    
+    # remove stray bullet symbols
+    text = text.replace("*", "").replace("-", "")
+
+    # add spaces when missing
+    text = re.sub(r'(\d)([A-Za-z])', r'\1 \2', text)
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+    text = re.sub(r'([A-Za-z])(\d)', r'\1 \2', text)
+    text = re.sub(r'\s+', ' ', text)
+
+    return text.strip()
 
 if not st.session_state.get("email"):
     st.warning("Please log in first")
@@ -94,13 +115,54 @@ if st.session_state.email:
     st.session_state.expenses_df = st.data_editor(st.session_state.expenses_df, num_rows = "dynamic", use_container_width=True)
     st.session_state.expenses_df = st.session_state.expenses_df[st.session_state.expenses_df["Delete"] == False]
     st.subheader("Optional: Spending Analysis")
-    st.write("Upload your past transactions to see how your actual spending compares to your planned budget. We’ll highlight patterns and show whether your current budget is realistic.")
-    spending_files = st.file_uploader(label = "Upload csv(s) of your debit (and/or) credit card statements in the past 1-2 months.", type = "csv", accept_multiple_files=True)
-    if spending_files is not None:
+    st.write("At the end of the month, upload your past transactions to see how your actual spending compared to your planned budget. We’ll highlight patterns and show how closely your spending aligned with your planned budget.")
+    spending_files = st.file_uploader(label = "Upload csv(s) of your debit (and/or) credit card statements in the past month.", type = "csv", accept_multiple_files=True)
+    if "spending_files_list" not in st.session_state:
+        st.session_state.spending_files_list = []
+    if spending_files:
+        st.session_state.spending_files_list = []
         for uploaded_file in spending_files:
             df = pd.read_csv(uploaded_file)
             st.write(f"{uploaded_file.name} preview:")
             st.write(df.head())
+            st.session_state.spending_files_list.append(df.to_dict(orient = "records"))
+    def build_user_context_data():
+        return f"""
+    Here is the user's planned budget: {st.session_state.expenses_df.to_dict(orient="records")}
+    Here is/are the user's past month of spending: {st.session_state.get("spending_files_list", [])}
+    For context, today's date is: {date.today()}
+
+
+    Please remember:
+    Do NOT use *, -, or any bullet symbols (e.g., if you want to say "5-6 months" say "5 to 6 months" or "5 or 6 months"). Please respect this. No symbols use words in their place instead, be creative if needed. 
+    """
+    if st.session_state.get("spending_files_list"):
+        st.write("Insights:")
+        client = ai_recs_spending()
+
+        user_context = build_user_context_data()
+
+        response = client.chat(
+            messages=[
+                {"role": "system", "content": user_context}
+            ],
+            stream=False
+        )
+
+        recommendations = clean_text(response.choices[0].message.content)
+
+        # split based on new lines
+        lines = recommendations.split("\n")
+
+        # fallback in case LLM ignores newline rule
+        if len(lines) <= 1:
+            import re
+            lines = re.split(r'\.\s+', recommendations)
+
+        for line in lines:
+            line = line.strip()
+            if line:
+                st.markdown(f"{line}")
     if st.button("Save Income and Expenses"):
         st.session_state.profile = {
             "email": email,
