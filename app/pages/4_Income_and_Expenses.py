@@ -98,7 +98,7 @@ if st.session_state.email:
     if spending_files is not None:
         for uploaded_file in spending_files:
             df = pd.read_csv(uploaded_file)
-            st.write(f"File {uploaded_file}")
+            st.write(f"File {uploaded_file[1]}")
             st.write(df.head())
     if st.button("Save Income and Expenses"):
         st.session_state.profile = {
