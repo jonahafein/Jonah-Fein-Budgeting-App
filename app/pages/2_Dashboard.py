@@ -193,7 +193,7 @@ monthly_margin = utils.calculate_monthly_margin(monthly_take_home = monthly_take
 st.session_state.monthly_margin = monthly_margin
 st.write(f"Net Worth: ${net_worth:,.2f}")
 st.write(f"Monthly Income After Tax (before any traditional 401k investing): ${monthly_margin + st.session_state.expenses_df["amount"].sum():,.2f}")
-st.write(f"Monthly Expenses: ${st.session_state.expenses_df["amount"].sum():,.2f}")
+st.write(f"Monthly Expenses: ${st.session_state.expenses_df["amount"].sum():,.2f} (see spending analysis on income and expenses page for more insight)")
 st.write(f"Monthly Margin (before any traditional 401k investing): ${monthly_margin:,.2f}")
 
 # check or x if reached, if x by how much
