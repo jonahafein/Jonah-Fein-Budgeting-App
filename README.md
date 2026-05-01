@@ -4,7 +4,8 @@ This will be a manual budgeting app inspired by the Every Dollar app.
 Eventually it will (hopefully) not be manual.
 
 TODO/Ideas:
-- At the end of month, import csv's of debit and credit spending and compare how you did to budget - will probably require LLM to parse and compare
+- At the end of month, import csv's of debit and credit spending and compare how you did to budget - will probably require LLM to parse and compare (keep working on this feature)
+- save statements to supabase to keep them uploaded?
 - Improve settings (e.g., how many months savings do they want emergency, how important, anything else we should know in < 3 sentences, etc.)
 - Consistent capitalization
 - Tax deduction for kids + other deductions
