@@ -96,7 +96,9 @@ if st.session_state.email:
     st.caption("The following section is completely optional. If you choose to proceed, we will analyze your past spending to optimize your current planned budget.")
     spending_files = st.file_uploader(label = "Upload csv(s) of your debit (and/or) credit card statements in the past 1-2 months.", type = "csv", accept_multiple_files=True)
     if spending_files is not None:
-        st.write(spending_files)
+        for uploaded_file in spending_files:
+            df = pd.DataFrame(uploaded_file)
+            st.write(df)
     if st.button("Save Income and Expenses"):
         st.session_state.profile = {
             "email": email,
