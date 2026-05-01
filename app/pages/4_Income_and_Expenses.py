@@ -97,7 +97,7 @@ if st.session_state.email:
     spending_files = st.file_uploader(label = "Upload csv(s) of your debit (and/or) credit card statements in the past 1-2 months.", type = "csv", accept_multiple_files=True)
     if spending_files is not None:
         for uploaded_file in spending_files:
-            df = pd.DataFrame(uploaded_file)
+            df = pd.read_csv(uploaded_file)
             st.write(df)
     if st.button("Save Income and Expenses"):
         st.session_state.profile = {
