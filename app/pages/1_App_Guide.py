@@ -44,5 +44,12 @@ After updating, return to the dashboard to see:
 - An updated financial snapshot  
 - Revised recommendations  
 - New projections  
+            
+**NOTE:** If you reload the app at any point, you will have to log back in. There is no need to reload after saving values. 
+            
+--- 
+## Coming Soon
+- A place in the app to download and upload bank statements to see how your spending compared to your chosen budget
+- Excel Sheet export of your financial plan
  
 """)

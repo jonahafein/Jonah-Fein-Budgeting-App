@@ -4,12 +4,11 @@ This will be a manual budgeting app inspired by the Every Dollar app.
 Eventually it will (hopefully) not be manual.
 
 TODO/Ideas:
+- At the end of month, import csv's of debit and credit spending and compare how you did to budget
 - Improve settings (e.g., how many months savings do they want emergency, how important, anything else we should know in < 3 sentences, etc.)
 - Consistent capitalization
-- COULD have ai do the recs that way settings and preferences can be met
 - Tax deduction for kids + other deductions
 - Side hustle income (for taxes and overall app)
-- Could do percentile of net worth for age or percentile of everything for age
 - Add buckets savings (for specific things)
 - Savings buckets/goals
 - Projections could include time frame for getting out of debt for those in debt, also time frame for savings goals/buckets
