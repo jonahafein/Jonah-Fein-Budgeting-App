@@ -116,6 +116,7 @@ if st.session_state.email:
     st.session_state.expenses_df = st.session_state.expenses_df[st.session_state.expenses_df["Delete"] == False]
     st.subheader("Optional: Spending Analysis")
     st.write("At the end of the month, upload your past transactions to see how your actual spending compared to your planned budget. We’ll highlight patterns and show how closely your spending aligned with your planned budget.")
+    st.caption("NOTE: This is a beta release of this feature. Further improvements coming soon.")
     spending_files = st.file_uploader(label = "Upload csv(s) of your debit (and/or) credit card statements in the past month.", type = "csv", accept_multiple_files=True)
     if "spending_files_list" not in st.session_state:
         st.session_state.spending_files_list = []
@@ -124,7 +125,7 @@ if st.session_state.email:
         for uploaded_file in spending_files:
             df = pd.read_csv(uploaded_file)
             st.write(f"{uploaded_file.name} preview:")
-            st.write(df.head())
+            st.write(df.head(3))
             st.session_state.spending_files_list.append(df.to_dict(orient = "records"))
     def build_user_context_data():
         return f"""
