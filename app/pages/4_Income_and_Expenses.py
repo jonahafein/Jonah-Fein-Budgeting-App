@@ -93,8 +93,8 @@ if st.session_state.email:
     st.write("Edit or delete expenses here:")
     st.session_state.expenses_df = st.data_editor(st.session_state.expenses_df, num_rows = "dynamic", use_container_width=True)
     st.session_state.expenses_df = st.session_state.expenses_df[st.session_state.expenses_df["Delete"] == False]
-    st.subheader("Spend Analyzer")
-    st.write("The following section is completely optional. If you choose to proceed, we will analyze your past spending to optimize your current planned budget.")
+    st.subheader("Optional: Spending Analysis")
+    st.write("Upload your past transactions to see how your actual spending compares to your planned budget. We’ll highlight patterns and show whether your current budget is realistic.")
     spending_files = st.file_uploader(label = "Upload csv(s) of your debit (and/or) credit card statements in the past 1-2 months.", type = "csv", accept_multiple_files=True)
     if spending_files is not None:
         for uploaded_file in spending_files:
